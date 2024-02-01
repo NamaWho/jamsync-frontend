@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {FiLink} from 'react-icons/fi';
-import {MdInfo} from 'react-icons/md';
+import {MdCalendarMonth, MdInfo, MdLocationCity, MdOutlinePermIdentity, MdPassword, MdPiano, MdTransgender} from 'react-icons/md';
 import {GiMailbox} from 'react-icons/gi';
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import { FaItunesNote } from "react-icons/fa6";
+import { FaGuitar, FaItunesNote } from "react-icons/fa6";
+import { FaBirthdayCake } from "react-icons/fa";
 import Select from 'react-select';
-import axios from 'axios';
-
-
+import locations from '../../assets/locations.json';
 
 const Signup = () => {
     const [type, setType] = useState('Musician');
@@ -18,8 +17,11 @@ const Signup = () => {
     const [genres, setGenres] = useState([]);
     const [instruments, setInstruments] = useState([]);
     const [location, setLocation] = useState(null);
-    const [locationLabel, setLocationLabel] = useState('');
-    const [locationsProposed, setLocationsProposed] = useState([]);
+    const locationOptions = locations.map((location, index) => ({
+        value: location,
+        label: location.city.toUpperCase(),
+    }));
+    const [locationsProposed, setLocationsProposed] = useState(locationOptions.splice(0, 10));
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('-');
@@ -47,8 +49,7 @@ const Signup = () => {
         "Piano"
     ]
     const instrumentsOptions = availableInstruments.map(instrument => ({ value: instrument, label: instrument }));
-
-
+    
     const handleGenreChange = (selectedOptions) => {
         setGenres(selectedOptions || []);
     };
@@ -57,20 +58,14 @@ const Signup = () => {
         setInstruments(selectedOptions || []);
     };
 
-    const handleLocationLabelChange = async (event) => {
-            setLocationLabel(event.target.value);
-        
-            // Replace with your actual API endpoint
-            const response = await axios.get(`${process.env.BASE_URI}/locations?prefix=${event.target.value}`);
-            
-            setLocationsProposed(response.data);
-    }
-
-    const handleLocationClick = (location) => {
-        setLocation(location);
-        setLocationLabel(location);
-        setLocationsProposed([]);
+    const handleLocationInputChange = (inputValue) => {
+        setLocationsProposed(locationOptions.filter(option => option.value.city.toUpperCase().includes(inputValue.toUpperCase())).splice(0, 10));
     };
+
+    const handleLocationChange = (selectedOption) => {
+        setLocation(selectedOption.value);
+    };
+
     
     const handleSignup = (event) => {
         event.preventDefault();
@@ -79,36 +74,45 @@ const Signup = () => {
 
     return (
         <div className='flex flex-col items-center overflow-y-scroll w-full'>
-            <div className='rounded-[8px] bg-white border-t-[4px] border-[#4E73DF] w-9/12 flex items-center justify-between hover:shadow-lg transform transition duration-300 ease-out overflow-y-auto mt-16'>
+            <div className='rounded-[8px] bg-white border-t-[4px] border-[#4E73DF] w-1/2 flex items-center justify-between hover:shadow-lg transform transition duration-300 ease-out overflow-y-auto mt-16'>
                 <form onSubmit={handleSignup} className='bg-[#F8F9FC] p-[20px] rounded-[5px] shadow-lg w-full mx-auto'>
                     <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-[10px]'>Signup</h2>
                     
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <FaItunesNote />
-                        <label htmlFor="type">Type</label>
-                        <div>
-                            <input 
-                                type="radio" 
-                                name="type" 
-                                value="Musician"
-                                checked={type === "Musician"}
-                                onChange={(e) => setType(e.target.value)}
-                            />
-                            <label htmlFor="Musician">Musician</label>
-                            <input 
-                                type="radio" 
-                                name="type" 
-                                value="Band"
-                                checked={type === "Band"}
-                                onChange={(e) => setType(e.target.value)}
-                            />
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <FaItunesNote />
+                            <label className="font-bold" htmlFor="type">Type</label>
+                            
+                        </div>
+                        <div className='flex space-x-3'>
+                            <div className="flex space-x-3">
+                                <input 
+                                    type="radio" 
+                                    name="type" 
+                                    value="Musician"
+                                    checked={type === "Musician"}
+                                    onChange={(e) => setType(e.target.value)}
+                                />
+                                <label htmlFor="Musician">Musician</label>
+                            </div>
+                            <div className="flex space-x-3">
+                                <input 
+                                    type="radio" 
+                                    name="type" 
+                                    value="Band"
+                                    checked={type === "Band"}
+                                    onChange={(e) => setType(e.target.value)}
+                                />
+                            </div>
                             <label htmlFor="Band">Band</label>
                         </div>
                     </div>
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <MdOutlineAlternateEmail />
-                        <label htmlFor="username">Username</label>
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <MdOutlineAlternateEmail />
+                            <label className="font-bold" htmlFor="username">Username</label>
+                        </div>
                         <input 
                             type="text" 
                             name="username" 
@@ -116,11 +120,14 @@ const Signup = () => {
                             onChange={(e) => setUsername(e.target.value)}
                             required
                         />
+                    
                     </div>
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <GiMailbox />
-                        <label htmlFor="contactEmail">Contact Email</label>
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <GiMailbox />
+                            <label className="font-bold" htmlFor="contactEmail">Contact Email</label>
+                        </div>
                         <input 
                             type="email" 
                             name="contactEmail" 
@@ -130,9 +137,11 @@ const Signup = () => {
                         />
                     </div>
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <MdInfo />
-                        <label htmlFor="about">About</label>
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <MdInfo />
+                            <label className="font-bold" htmlFor="about">About</label>
+                        </div>
                         <textarea 
                             name="about" 
                             value={about}
@@ -141,9 +150,11 @@ const Signup = () => {
                         />
                     </div>
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <FiLink />
-                        <label htmlFor="profilePictureUrl">Profile Picture URL</label>
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <FiLink />
+                            <label className="font-bold" htmlFor="profilePictureUrl">Profile Picture URL</label>
+                        </div>
                         <input 
                             type="url" 
                             name="profilePictureUrl" 
@@ -152,9 +163,11 @@ const Signup = () => {
                         />
                     </div>
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <FaItunesNote />
-                        <label>Genres</label>
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <FaItunesNote />
+                            <label className="font-bold">Genres</label>
+                        </div>
                         <Select 
                             isMulti
                             options={genreOptions}
@@ -165,9 +178,11 @@ const Signup = () => {
                         />
                     </div>
 
-                    {type === "Musician" && <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                                                <FaItunesNote />
-                                                <label>Instruments</label>
+                    {type === "Musician" && <div className='flex flex-col space-x-4 mb-[10px]'>
+                                                <div className='flex space-x-3 items-center mb-3'>
+                                                    <MdPiano />
+                                                    <label className="font-bold">Instruments</label>
+                                                </div>
                                                 <Select 
                                                     isMulti
                                                     options={instrumentsOptions}
@@ -179,23 +194,30 @@ const Signup = () => {
                                             </div>
                     }
 
-                    <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                        <FaItunesNote />
-                        <label htmlFor="location">Location</label>
-                        <div>
-                            <input type="text" value={locationLabel} onChange={handleLocationLabelChange} />
-                            {locationsProposed.map((location, index) => (
-                                <div key={index} onClick={() => handleLocationClick(location)}>
-                                {location}
-                                </div>
-                            ))}
+                    <div className='flex flex-col space-x-4 mb-[10px]'>
+                        <div className='flex space-x-3 items-center mb-3'>
+                            <MdLocationCity />
+                            <label className="font-bold" htmlFor="location">City</label>
                         </div>
+                        {/* <Select
+                            value={locationOptions.find(option => option.value.toUpperCase() === locationLabel)}
+                            onChange={option => handleLocationClick(option.value)}
+                            options={locationOptions}
+                        /> */}
+                        <Select
+                            value={locationsProposed.find(option => option.value === location)}
+                            onChange={handleLocationChange}
+                            onInputChange={handleLocationInputChange}
+                            options={locationsProposed}
+                        />
                     </div>
 
                     {type === "Musician" && <>
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <FaItunesNote />
-                            <label htmlFor="firstName">First Name</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <MdOutlinePermIdentity />
+                                <label className="font-bold" htmlFor="firstName">First Name</label>
+                            </div>
                             <input 
                                 type="text" 
                                 name="firstName" 
@@ -204,9 +226,11 @@ const Signup = () => {
                             />
                         </div>
 
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <FaItunesNote />
-                            <label htmlFor="lastName">Last Name</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <MdOutlinePermIdentity />
+                                <label className="font-bold" htmlFor="lastName">Last Name</label>
+                            </div>
                             <input 
                                 type="text" 
                                 name="lastName" 
@@ -215,37 +239,48 @@ const Signup = () => {
                             />
                         </div>
 
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <label htmlFor='gender'>Gender</label>
-                            <input 
-                                type="radio" 
-                                name="gender" 
-                                value="-"
-                                checked={gender === "-"}
-                                onChange={(e) => setGender(e.target.value)}
-                            />
-                            <label htmlFor="-">-</label>
-                            <input 
-                                type="radio" 
-                                name="gender" 
-                                value="M"
-                                checked={gender === "M"}
-                                onChange={(e) => setGender(e.target.value)}
-                            />
-                            <label htmlFor="M">M</label>
-                            <input 
-                                type="radio" 
-                                name="gender" 
-                                value="F"
-                                checked={gender === "F"}
-                                onChange={(e) => setGender(e.target.value)}
-                            />
-                            <label htmlFor="F">F</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>  
+                                <MdTransgender />
+                                <label className="font-bold" htmlFor='gender'>Gender</label>
+                            </div>
+                            <div className="flex space-x-3">
+                                <input 
+                                    type="radio" 
+                                    name="gender" 
+                                    value="-"
+                                    checked={gender === "-"}
+                                    onChange={(e) => setGender(e.target.value)}
+                                />
+                                <label htmlFor="-">-</label>
+                            </div>
+                            <div className="flex space-x-3">
+                                <input 
+                                    type="radio" 
+                                    name="gender" 
+                                    value="M"
+                                    checked={gender === "M"}
+                                    onChange={(e) => setGender(e.target.value)}
+                                />
+                                <label htmlFor="M">M</label>
+                            </div>
+                            <div className="flex space-x-3">
+                                <input 
+                                    type="radio" 
+                                    name="gender" 
+                                    value="F"
+                                    checked={gender === "F"}
+                                    onChange={(e) => setGender(e.target.value)}
+                                />
+                                <label htmlFor="F">F</label>
+                            </div>
                         </div>
 
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <FaItunesNote />
-                            <label htmlFor="age">Age</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <MdCalendarMonth />
+                                <label className="font-bold" htmlFor="age">Age</label>
+                            </div>
                             <input 
                                 type="number" 
                                 name="age" 
@@ -257,9 +292,11 @@ const Signup = () => {
                     }
                     {type === "Band" &&
                         <>
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <FaItunesNote />
-                            <label htmlFor="yearsTogether">Years Together</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <FaBirthdayCake />
+                                <label className="font-bold" htmlFor="yearsTogether">Years Together</label>
+                            </div>
                             <input 
                                 type="number" 
                                 name="yearsTogether" 
@@ -268,9 +305,11 @@ const Signup = () => {
                             />
                         </div>
 
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <FaItunesNote />
-                            <label htmlFor="gigsPlayed">Gigs Played</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <FaGuitar />
+                                <label className="font-bold" htmlFor="gigsPlayed">Gigs Played</label>
+                            </div>
                             <input 
                                 type="number" 
                                 name="gigsPlayed" 
@@ -284,9 +323,11 @@ const Signup = () => {
                     <div>
                         <h3 className='text-[18px] leading-[20px] font-bold text-[#5a5c69] mb-[10px]'>Credentials</h3>
                     
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <MdOutlineAlternateEmail />
-                            <label htmlFor="user">User</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <MdOutlineAlternateEmail />
+                                <label className="font-bold" htmlFor="user">User</label>
+                            </div>
                             <input 
                                 type="text" 
                                 name="user" 
@@ -296,9 +337,11 @@ const Signup = () => {
                                 />
                         </div>
 
-                        <div className='flex items-center justify-between space-x-4 mb-[10px]'>
-                            <MdOutlineAlternateEmail />
-                            <label htmlFor="password">Password</label>
+                        <div className='flex flex-col space-x-4 mb-[10px]'>
+                            <div className='flex space-x-3 items-center mb-3'>
+                                <MdPassword />
+                                <label className="font-bold" htmlFor="password">Password</label>
+                            </div>
                             <input 
                                 type="password" 
                                 name="password" 
