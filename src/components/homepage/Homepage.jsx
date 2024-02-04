@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FaSearch, FaRegBell, FaEnvelope } from 'react-icons/fa';
+import { FaSearch, FaRegBell, FaEnvelope, FaUser } from 'react-icons/fa';
 import { FaRegCalendarMinus } from 'react-icons/fa';
+import { IoIosMale, IoIosFemale } from 'react-icons/io';
 import Select from 'react-select';
 import locations from '../../assets/locations.json';
 import { searchUsers } from '../../services/homepageService';
@@ -32,6 +33,8 @@ const Homepage = () => {
     const [searchGender, setSearchGender] = useState('-');
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
+
+    const [searchResults, setSearchResults] = useState([]);
 
     const availableGenres = [
         "Alternative",
@@ -88,13 +91,14 @@ const Homepage = () => {
             pageSize,
             pageNumber
         }
-        console.log(params);
-        const data = await searchUsers(params);
-        console.log(data);
+        const result = await searchUsers(params);
+        console.log(result.data);
+
+        setSearchResults(result.data.payload);
     }
 
     return (
-        <div className='px-[25px] pt-[25px] bg-[#F8F9FC] pb-[40px] h-full'>
+        <div className='px-[25px] pt-[25px] bg-[#F8F9FC] pb-[40px]'>
             <div className='rounded-[8px] flex items-center justify-between h-[70px] shadow-md px-[25px] '>
                 <div className='flex items-center rounded-[5px]'>
                     <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi {username}, welcome back! 👋🏼</h2>
@@ -146,7 +150,7 @@ const Homepage = () => {
                 </div>
             </div>
             {/* search form */}
-            <div className='rounded-[8px] flex flex-col justify-between border-t-[4px] border-[#FF0000] mx-16 mt-8 px-12 py-8 cursor-pointer hover:shadow-lg transform transition duration-300 ease-out bg-white'>
+            <div className='rounded-[8px] flex flex-col justify-between border-t-[4px] border-[#FF0000] mx-16 my-8 px-12 py-8 cursor-pointer hover:shadow-lg transform transition duration-300 ease-out bg-white'>
                 <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-8'>SEARCH FOR MUSICIANS, BANDS AND OPPORTUNITIES</h2>
                 {/* search by type, username, genres, instruments, location */}
                 <form className='grid grid-cols-4'>
@@ -265,6 +269,25 @@ const Homepage = () => {
                     </div>
                 </form>
             </div>
+
+            {/* search results */}
+            {searchResults.length !== 0 &&  <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
+                {searchResults.map((result, index) => (
+                    <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4'>
+                        <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.username}</h2>
+                        <p className='italic text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.about.length > 100 ? result.about.substring(0, 100) + '...' : result.about.length === 0 ? "No description provided..." : result.about}</p>
+                        <div className='flex items-center justify-between'>
+                            {result.age && <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.age} yrs</p>}
+                            <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.location.city}, {result.location.country}</p>
+                            {result.gender === "-" && <FaUser fontSize={28} color="" />}
+                            {result.gender === "M" && <IoIosMale fontSize={28} color="" />}
+                            {result.gender === "F" && <IoIosFemale fontSize={28} color="" />}
+                        </div>
+                    </div>
+                ))}
+            </div>}
+
+
         </div>
     )
 }
