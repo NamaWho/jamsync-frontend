@@ -3,6 +3,7 @@ import { FaSearch, FaRegBell, FaEnvelope } from 'react-icons/fa';
 import { FaRegCalendarMinus } from 'react-icons/fa';
 import Select from 'react-select';
 import locations from '../../assets/locations.json';
+import { searchUsers } from '../../services/homepageService';
 
 const Homepage = () => {
     const [open, setOpen] = useState(false)
@@ -12,7 +13,14 @@ const Homepage = () => {
     const [searchUsername, setSearchUsername] = useState('');
     const [searchGenres, setSearchGenres] = useState([]);
     const [searchInstruments, setSearchInstruments] = useState([]);
-    const [searchLocation, setSearchLocation] = useState('');
+    const [searchLocation, setSearchLocation] = useState({
+        city: "",
+        country: "",
+        state: "",
+        geojson: {
+            coordinates: []
+        }
+    });
     const locationOptions = locations.map((location, index) => ({
         value: location,
         label: location.city.toUpperCase(),
@@ -65,9 +73,24 @@ const Homepage = () => {
         setSearchLocation(selectedOption.value);
     };
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         e.preventDefault();
-        console.log(searchType, searchUsername, searchGenres, searchInstruments, searchLocation, searchMaxDistance, searchMaxAge, searchMinAge, searchGender, pageSize, pageNumber);
+        const params = {
+            type: searchType,
+            username: searchUsername,
+            genres: searchGenres.map(genre => genre.value),
+            instruments: searchInstruments.map(instrument => instrument.value),
+            location: searchLocation,
+            maxDistance: searchMaxDistance,
+            maxAge: searchMaxAge,
+            minAge: searchMinAge,
+            gender: searchGender,
+            pageSize,
+            pageNumber
+        }
+        console.log(params);
+        const data = await searchUsers(params);
+        console.log(data);
     }
 
     return (
@@ -177,7 +200,7 @@ const Homepage = () => {
 
                         <div className='flex flex-col space-x-4 w-5/6'>
                             <label htmlFor="maxDistance" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>Max Distance - {searchMaxDistance} km</label>
-                            <input type="range" id="maxDistance" name="maxDistance" min="1" max="250" onChange={(e) => setSearchMaxDistance(e.target.value)} className='bg-white mt-3 outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal' />
+                            <input type="range" id="maxDistance" name="maxDistance" min="1" max="250" onChange={(e) => setSearchMaxDistance(parseInt(e.target.value))} className='bg-white mt-3 outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal' />
                         </div>
                     </div>
 
@@ -198,7 +221,7 @@ const Homepage = () => {
                                 type="number" 
                                 name="maxAge" 
                                 value={searchMaxAge}
-                                onChange={(e) => setSearchMaxAge(e.target.value)}
+                                onChange={(e) => setSearchMaxAge(parseInt(e.target.value))}
                             />
                         </div>
 
@@ -208,7 +231,7 @@ const Homepage = () => {
                                 type="number" 
                                 name="MinAge" 
                                 value={searchMinAge}
-                                onChange={(e) => setSearchMinAge(e.target.value)}
+                                onChange={(e) => setSearchMinAge(parseInt(e.target.value))}
                             />
                         </div>
                     </div>
@@ -221,7 +244,7 @@ const Homepage = () => {
                                 type="number" 
                                 name="pageSize" 
                                 value={pageSize}
-                                onChange={(e) => setPageSize(e.target.value)}
+                                onChange={(e) => setPageSize(parseInt(e.target.value))}
                             />
                         </div>
 
@@ -231,7 +254,7 @@ const Homepage = () => {
                                 type="number" 
                                 name="pageNumber" 
                                 value={pageNumber}
-                                onChange={(e) => setPageNumber(e.target.value)}
+                                onChange={(e) => setPageNumber(parseInt(e.target.value))}
                             />
                         </div>
                     </div>
