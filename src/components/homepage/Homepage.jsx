@@ -4,12 +4,15 @@ import { FaRegCalendarMinus } from 'react-icons/fa';
 import { IoIosMale, IoIosFemale } from 'react-icons/io';
 import Select from 'react-select';
 import locations from '../../assets/locations.json';
-import { searchUsers } from '../../services/homepageService';
+import { searchUsers, searchOpportunities } from '../../services/homepageService';
+import { useNavigate } from 'react-router-dom'
 
 const Homepage = () => {
     const [open, setOpen] = useState(false)
     const [username, setUsername] = useState('douglymcgee');
+    let navigate = useNavigate()
 
+    const [searchForUser, setSearchForUser] = useState("Musician");
     const [searchType, setSearchType] = useState('Musician');
     const [searchUsername, setSearchUsername] = useState('');
     const [searchGenres, setSearchGenres] = useState([]);
@@ -76,10 +79,15 @@ const Homepage = () => {
         setSearchLocation(selectedOption.value);
     };
 
+    const navigateToUser = (type, id, result) => {
+        navigate(`/${type}s/${id}`, {state: { detail: result }});
+    }
+
     const handleSearch = async (e) => {
         e.preventDefault();
         const params = {
             type: searchType,
+            forUser: searchForUser,
             username: searchUsername,
             genres: searchGenres.map(genre => genre.value),
             instruments: searchInstruments.map(instrument => instrument.value),
@@ -91,9 +99,13 @@ const Homepage = () => {
             pageSize,
             pageNumber
         }
-        const result = await searchUsers(params);
-        console.log(result.data);
-
+        let result;
+        if (searchType === "Opportunity") 
+            result = await searchOpportunities(params);
+        else 
+            result = await searchUsers(params);
+        
+        console.log(result);
         setSearchResults(result.data.payload);
     }
 
@@ -269,13 +281,21 @@ const Homepage = () => {
                     </div>
                 </form>
             </div>
-
             {/* search results */}
-            {searchResults.length !== 0 &&  <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
+            {searchResults.length !== 0 && 
+             <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
                 {searchResults.map((result, index) => (
-                    <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4'>
-                        <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.username}</h2>
-                        <p className='italic text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.about.length > 100 ? result.about.substring(0, 100) + '...' : result.about.length === 0 ? "No description provided..." : result.about}</p>
+                    <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToUser(searchType.toLowerCase(), result._id, result)}>
+                        <div className="flex justify-between">
+                            <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.username}</h2>
+                            {result.profilePictureUrl === "" && 
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200">
+                                    <FaUser fontSize={28} color="" />
+                                </div>
+                            }
+                            {result.profilePictureUrl !== "" && <img src={result.profilePictureUrl} alt="" className='h-12 w-12 rounded-full' />}
+                        </div>
+                        <p className='italic text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{(!result.about || result.about.length === 0) ? "No description provided..." : result.about.length > 100 ? result.about.substring(0, 100) + '...' : result.about}</p>
                         <div className='flex items-center justify-between'>
                             {result.age && <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.age} yrs</p>}
                             <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.location.city}, {result.location.country}</p>
