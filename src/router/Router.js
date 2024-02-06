@@ -7,6 +7,7 @@ import Login from "../components/signin/Login";
 import Signup from "../components/signup/Signup";
 import Homepage from "../components/homepage/Homepage";
 import RegisteredUser from "../components/registereduser/RegisteredUser";
+import Opportunity from "../components/opportunity/Opportunity";
 
 const Router = () => {
   return (
@@ -19,6 +20,7 @@ const Router = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/musicians/:id" element={<RegisteredUser type="musician"/>} />
           <Route path="/bands/:id" element={<RegisteredUser type="band"/>} />
+          <Route path="/opportunities/:id" element={<Opportunity />} />
           <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
       </BrowserRouter>

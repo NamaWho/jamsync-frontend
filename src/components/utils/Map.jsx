@@ -1,8 +1,8 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
-const Map = ({ user }) => {
-  const position = [user.location.geojson.coordinates[1], user.location.geojson.coordinates[0]];
+const Map = ({ entity }) => {
+  const position = [entity.location.geojson.coordinates[1], entity.location.geojson.coordinates[0]];
 
   return (
     <MapContainer center={position} zoom={13} className='h-64 w-64'>
@@ -11,7 +11,7 @@ const Map = ({ user }) => {
       />
       <Marker position={position}>
         <Popup>
-          {user.location.city}, {user.location.country}
+          {entity.location.city}, {entity.location.country}
         </Popup>
       </Marker>
     </MapContainer>

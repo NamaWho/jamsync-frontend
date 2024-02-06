@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
+import { login } from '../../services/authService';
+import toast from 'react-hot-toast';
 
 const Login = () => {
+    const [type, setType] = useState('Musician');
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (event) => {
+    const handleLogin = async (event) => {
         event.preventDefault();
-        // Handle login logic here
+        const response = await login(type, user, password);
+        
+        // set the token in the local storage
+        if (!response.error){
+            localStorage.setItem('token', response.payload);
+            window.location = '/';
+        } else {
+            toast.error(response.error);
+        }
     }
 
     return (
@@ -14,6 +25,15 @@ const Login = () => {
             <div className='rounded-[8px] bg-white border-t-[4px] border-[#4E73DF] flex items-center justify-between cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
                 <form onSubmit={handleLogin} className='bg-[#F8F9FC] p-[20px] rounded-[5px] shadow-lg'>
                     <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-[10px]'>Login</h2>
+                    <select 
+                        className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal mb-[10px]' 
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                    >
+                        <option value="Musician">Musician</option>
+                        <option value="Band">Band</option>
+                        <option value="Admin">Administrator</option>
+                    </select>
                     <input 
                         type="text" 
                         className=' bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal mb-[10px]' 

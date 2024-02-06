@@ -7,8 +7,15 @@ import { FaGuitar, FaItunesNote } from "react-icons/fa6";
 import { FaBirthdayCake } from "react-icons/fa";
 import Select from 'react-select';
 import locations from '../../assets/locations.json';
+import baseGenres from '../../assets/genres.js';
+import baseInstruments from '../../assets/instruments.js';
+import { checkUser, register } from '../../services/authService.js';
+import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
+    const [submitDisabled, setSubmitDisabled] = useState(false);
     const [type, setType] = useState('Musician');
     const [username, setUsername] = useState('');
     const [contactEmail, setContactEmail] = useState('');
@@ -30,26 +37,14 @@ const Signup = () => {
     const [gigsPlayed, setGigsPlayed] = useState('');
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
-    const availableGenres = [
-        "Alternative",
-        "Blues",
-        "Classical",
-        "Country",
-        "Electronic",
-        "Folk",
-    ] 
+    const availableGenres = baseGenres;
     const genreOptions = availableGenres.map(genre => ({ value: genre, label: genre }));
     
-    const availableInstruments = [
-        "Acoustic Guitar",
-        "Bass Guitar",
-        "Drums",
-        "Electric Guitar",
-        "Keyboard",
-        "Piano"
-    ]
+    const availableInstruments = baseInstruments;
     const instrumentsOptions = availableInstruments.map(instrument => ({ value: instrument, label: instrument }));
     
+    let navigate = useNavigate();
+
     const handleGenreChange = (selectedOptions) => {
         setGenres(selectedOptions || []);
     };
@@ -66,10 +61,53 @@ const Signup = () => {
         setLocation(selectedOption.value);
     };
 
+    const handleUserChange = async (value) => {
+        // if the user already exists, show a message and disable the submit button
+        const exists = await checkUser(type.toLowerCase(), value);
+        if (exists)
+            toast.error('User already exists');
+        setSubmitDisabled(exists);
+        setUser(value);
+    };
     
-    const handleSignup = (event) => {
+    const handleSignup = async (event) => {
         event.preventDefault();
+        const labelsInstruments = instruments.map(instrument => instrument.label);
+        const labelsGenres = genres.map(genre => genre.label);
         // Handle Signup logic here
+        const payload = {
+            _id: uuidv4(),
+            username,
+            contactEmail,
+            about,
+            profilePictureUrl,
+            genres: labelsGenres,
+            instruments: labelsInstruments,
+            location,
+            firstName,
+            lastName,
+            gender, 
+            age, 
+            yearsTogether,
+            gigsPlayed,
+            credentials: {
+                user,
+                password
+            },
+            creationDateTime: new Date().toISOString().split('T')[0],
+            lastUpdateDateTime: new Date().toISOString().split('T')[0],
+            lastLoginDateTime: new Date().toISOString().split('T')[0],
+            applications:[],
+            opportunities: []
+        }
+
+        const result = await register(type, payload);
+        if (result.error)
+            toast.error('Error creating user');
+        else {
+            toast.success('User created successfully');
+            navigate('/login');
+        }
     }
 
     return (
@@ -244,36 +282,12 @@ const Signup = () => {
                                 <MdTransgender />
                                 <label className="font-bold" htmlFor='gender'>Gender</label>
                             </div>
-                            <div className="flex space-x-3">
-                                <input 
-                                    type="radio" 
-                                    name="gender" 
-                                    value="-"
-                                    checked={gender === "-"}
-                                    onChange={(e) => setGender(e.target.value)}
-                                />
-                                <label htmlFor="-">-</label>
-                            </div>
-                            <div className="flex space-x-3">
-                                <input 
-                                    type="radio" 
-                                    name="gender" 
-                                    value="M"
-                                    checked={gender === "M"}
-                                    onChange={(e) => setGender(e.target.value)}
-                                />
-                                <label htmlFor="M">M</label>
-                            </div>
-                            <div className="flex space-x-3">
-                                <input 
-                                    type="radio" 
-                                    name="gender" 
-                                    value="F"
-                                    checked={gender === "F"}
-                                    onChange={(e) => setGender(e.target.value)}
-                                />
-                                <label htmlFor="F">F</label>
-                            </div>
+                            <select onChange={(e) => setGender(e.target.value)} value={gender}>
+                                <option value="-">-</option>
+                                <option value="M">M</option>
+                                <option value="F">F</option>
+                            </select>
+
                         </div>
 
                         <div className='flex flex-col space-x-4 mb-[10px]'>
@@ -285,7 +299,8 @@ const Signup = () => {
                                 type="number" 
                                 name="age" 
                                 value={age}
-                                onChange={(e) => setAge(e.target.value)}
+                                onChange={(e) => setAge(parseInt(e.target.value))}
+                                required
                             />
                         </div>
                     </>
@@ -301,7 +316,7 @@ const Signup = () => {
                                 type="number" 
                                 name="yearsTogether" 
                                 value={yearsTogether}
-                                onChange={(e) => setYearsTogether(e.target.value)}
+                                onChange={(e) => setYearsTogether(parseInt(e.target.value))}
                             />
                         </div>
 
@@ -314,7 +329,7 @@ const Signup = () => {
                                 type="number" 
                                 name="gigsPlayed" 
                                 value={gigsPlayed}
-                                onChange={(e) => setGigsPlayed(e.target.value)}
+                                onChange={(e) => setGigsPlayed(parseInt(e.target.value))}
                             />
                         </div>
                         </>
@@ -332,7 +347,7 @@ const Signup = () => {
                                 type="text" 
                                 name="user" 
                                 value={user}
-                                onChange={(e) => setUser(e.target.value)}
+                                onChange={(e) => handleUserChange(e.target.value)}
                                 required
                                 />
                         </div>
@@ -352,7 +367,7 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className='bg-[#4E73DF] h-[40px] w-full rounded-[5px] text-white font-bold'>Signup</button>
+                    <button type="submit" disabled={submitDisabled} className='bg-[#4E73DF] h-[40px] w-full rounded-[5px] text-white font-bold'>Signup</button>
                 </form>
             </div>
         </div>

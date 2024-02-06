@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaSearch, FaRegBell, FaEnvelope, FaUser } from 'react-icons/fa';
 import { FaRegCalendarMinus } from 'react-icons/fa';
 import { IoIosMale, IoIosFemale } from 'react-icons/io';
@@ -6,10 +6,12 @@ import Select from 'react-select';
 import locations from '../../assets/locations.json';
 import { searchUsers, searchOpportunities } from '../../services/homepageService';
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast';
+import { decodeJWT } from '../../services/utils/jwt';
 
 const Homepage = () => {
     const [open, setOpen] = useState(false)
-    const [username, setUsername] = useState('douglymcgee');
+    const [loggedUser, setLoggedUser] = useState(null);
     let navigate = useNavigate()
 
     const [searchForUser, setSearchForUser] = useState("Musician");
@@ -31,13 +33,14 @@ const Homepage = () => {
     }));
     const [locationsProposed, setLocationsProposed] = useState(locationOptions.splice(0, 10));
     const [searchMaxDistance, setSearchMaxDistance] = useState(25);
-    const [searchMaxAge, setSearchMaxAge] = useState(100);
-    const [searchMinAge, setSearchMinAge] = useState(1);
+    const [searchMaxAge, setSearchMaxAge] = useState(0);
+    const [searchMinAge, setSearchMinAge] = useState(0);
     const [searchGender, setSearchGender] = useState('-');
     const [pageSize, setPageSize] = useState(10);
     const [pageNumber, setPageNumber] = useState(1);
 
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchUsersResults, setSearchUsersResults] = useState([]);
+    const [searchOpportunitiesResults, setSearchOpportunitiesResults] = useState([]);
 
     const availableGenres = [
         "Alternative",
@@ -59,8 +62,26 @@ const Homepage = () => {
     ]
     const instrumentsOptions = availableInstruments.map(instrument => ({ value: instrument, label: instrument }));
 
+    const getAuthenticatedUser = () => {
+        // check if there is a token in the local storage
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = decodeJWT(token);
+            setLoggedUser(decoded);
+        }
+    }
+    useEffect(() => {
+        getAuthenticatedUser();
+    }, []);
+
     const showProfile = () => {
         setOpen(!open)
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        // refresh
+        window.location = '/';
     }
 
     const handleSearchGenreChange = (selectedOptions) => {
@@ -83,6 +104,10 @@ const Homepage = () => {
         navigate(`/${type}s/${id}`, {state: { detail: result }});
     }
 
+    const navigateToOpportunity = (id, result) => {
+        navigate(`/opportunities/${id}`, {state: { detail: result }});
+    }
+
     const handleSearch = async (e) => {
         e.preventDefault();
         const params = {
@@ -97,70 +122,108 @@ const Homepage = () => {
             minAge: searchMinAge,
             gender: searchGender,
             pageSize,
-            pageNumber
+            page: pageNumber
         }
-        let result;
-        if (searchType === "Opportunity") 
-            result = await searchOpportunities(params);
-        else 
-            result = await searchUsers(params);
+        let resultPromise;
+        if (searchType === "Opportunity") {
+            resultPromise = searchOpportunities(params);
+            toast.promise(resultPromise, {
+                loading: 'Searching...',
+                success: 'Opportunities found!',
+                error: 'No opportunities found!'
+            });
+        }
+        else {
+            resultPromise = searchUsers(params);
+            toast.promise(resultPromise, {
+                loading: 'Searching...',
+                success: 'Users found!',
+                error: 'No users found!'
+            });
+        }
         
-        console.log(result);
-        setSearchResults(result.data.payload);
+        resultPromise.then(result => {
+            if (searchType === "Opportunity"){
+                setSearchOpportunitiesResults(result.data.payload);
+                setSearchUsersResults([]);
+            } else {
+                setSearchUsersResults(result.data.payload);
+                setSearchOpportunitiesResults([]);
+            }
+        }).catch(err => {
+            console.error(err);
+        });
     }
 
     return (
         <div className='px-[25px] pt-[25px] bg-[#F8F9FC] pb-[40px]'>
-            <div className='rounded-[8px] flex items-center justify-between h-[70px] shadow-md px-[25px] '>
-                <div className='flex items-center rounded-[5px]'>
-                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi {username}, welcome back! 👋🏼</h2>
-                </div>
-                <div className='flex items-center gap-[20px]'>
-                    <div className='flex items-center gap-[15px] relative border-l-[1px] pl-[25px]' onClick={showProfile} >
-                        <p>Douglas McGee</p>
-                        <div className='h-[50px] w-[50px] rounded-full bg-[#4E73DF] cursor-pointer flex items-center justify-center relative z-40' >
-                            <img src={"https://img.villaggiomusicale.com/avt/5989.jpg"} alt="" className='rounded-full' />
-
-                        </div>
-
-                        {
-                            open &&
-                            <div className='bg-white border h-[120px] w-[150px] absolute bottom-[-135px] z-20 right-0 pt-[15px] pl-[15px] space-y-[10px]'>
-                                <p className='cursor-pointer hover:text-[blue] font-semibold'>Profile</p>
-                                <p className='cursor-pointer hover:text-[blue] font-semibold'>Settings</p>
-                                <p className='cursor-pointer hover:text-[blue] font-semibold'>Log out</p>
+            {loggedUser && 
+                <div className='rounded-[8px] flex items-center justify-between h-[70px] shadow-md px-[25px] '>
+                    <div className='flex items-center rounded-[5px]'>
+                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi {loggedUser.username}, welcome back! 👋🏼</h2>
+                    </div>
+                    <div className='flex items-center gap-[20px]'>
+                        <div className='flex items-center gap-[15px] relative border-l-[1px] pl-[25px]' onClick={showProfile} >
+                            <p>{loggedUser.firstName} {loggedUser.lastName}</p>
+                            <div className='h-[50px] w-[50px] rounded-full bg-[#4E73DF] cursor-pointer flex items-center justify-center relative z-40' >
+                                {loggedUser.profilePictureUrl !== "" && <img src={loggedUser.profilePictureUrl} alt="" className='rounded-full' />}
+                                {loggedUser.profilePictureUrl === "" && <FaUser fontSize={28} color="white" />}
                             </div>
 
-                        }
+                            {
+                                open &&
+                                <div className='bg-white border h-[120px] w-[150px] absolute bottom-[-135px] z-20 right-0 pt-[15px] pl-[15px] space-y-[10px]'>
+                                    <p className='cursor-pointer hover:text-[blue] font-semibold' onClick={() => navigate(`/${loggedUser.type}s/${loggedUser.id}`)}>Profile</p>
+                                    <p className='cursor-pointer hover:text-[blue] font-semibold' onClick={handleLogout}>Log out</p>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+            {!loggedUser && 
+                <div className='rounded-[8px] border-t-[4px] border-blue-400 flex items-center justify-between h-[70px] shadow-md px-[25px] '>
+                    <div className='flex items-center rounded-[5px]'>
+                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi, welcome to JamSync! 👋🏼</h2>
+                    </div>
+                    <div className='flex items-center gap-[20px]'>
+                       {/* sign in and sign up */}
+                        <div className='flex items-center gap-[15px]'>
+                            <p className='cursor-pointer hover:text-[blue] font-semibold' onClick={() => navigate("/login")}>Sign in</p>
+                            <p className='cursor-pointer hover:text-[blue] font-semibold' onClick={() => navigate("/signup")}>Sign up</p>
+                        </div>
+                    </div>
+                </div>
+            }
 
-            <div className='grid grid-cols-3 gap-24 px-16 mt-[25px] pb-[15px]'>
-                <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
-                    <div>
-                        <h2 className='text-[#B589DF] text-[11px] leading-[17px] font-bold'>FOR YOU...</h2>
-                        <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>MUSICIANS</h1>
-                    </div>
-                    <FaRegCalendarMinus fontSize={28} color="" />
+            {
+                loggedUser &&
+                <div className='grid grid-cols-3 gap-24 px-16 mt-[25px] pb-[15px]'>
+                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                        <div>
+                            <h2 className='text-[#B589DF] text-[11px] leading-[17px] font-bold'>FOR YOU...</h2>
+                            <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>MUSICIANS</h1>
+                        </div>
+                        <FaRegCalendarMinus fontSize={28} color="" />
 
-                </div>
-                <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#1CC88A] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
-                    <div>
-                        <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>
-                            FOR YOU...</h2>
-                        <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>BANDS</h1>
                     </div>
-                    <FaRegCalendarMinus fontSize={28} />
-                </div>
-                <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#36B9CC] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
-                    <div>
-                        <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>FOR YOU... </h2>
-                        <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>OPPORTUNITIES</h1>
+                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#1CC88A] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                        <div>
+                            <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>
+                                FOR YOU...</h2>
+                            <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>BANDS</h1>
+                        </div>
+                        <FaRegCalendarMinus fontSize={28} />
                     </div>
-                    <FaRegCalendarMinus fontSize={28} />
+                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#36B9CC] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                        <div>
+                            <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>FOR YOU... </h2>
+                            <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>OPPORTUNITIES</h1>
+                        </div>
+                        <FaRegCalendarMinus fontSize={28} />
+                    </div>
                 </div>
-            </div>
+            }
             {/* search form */}
             <div className='rounded-[8px] flex flex-col justify-between border-t-[4px] border-[#FF0000] mx-16 my-8 px-12 py-8 cursor-pointer hover:shadow-lg transform transition duration-300 ease-out bg-white'>
                 <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-8'>SEARCH FOR MUSICIANS, BANDS AND OPPORTUNITIES</h2>
@@ -174,8 +237,17 @@ const Homepage = () => {
                             <option value="Opportunity">Opportunity</option>
                         </select>
                     </div>
+                    {searchType === "Opportunity" &&
+                        <div className='flex flex-col w-3/4 mb-4'>
+                            <label htmlFor="forUser" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>For User</label>
+                            <select onChange={(e) => setSearchForUser(e.target.value)} name="forUser" id="forUser" className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal mb-[10px]'>
+                                <option value="Musician">Musician</option>
+                                <option value="Band">Band</option>
+                            </select>
+                        </div>
+                    }
                     <div className='flex flex-col w-3/4 mb-4'>
-                        <label htmlFor="username" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>Username</label>
+                        <label htmlFor="username" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{searchType !== "Opportunity" ? "Username" : "Publisher's username"}</label>
                         <input onChange={(e) => setSearchUsername(e.target.value)} value={searchUsername} type="text" className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal' placeholder='Username' />
                     </div>
                     
@@ -191,7 +263,7 @@ const Homepage = () => {
                         />
                     </div>
 
-                    {searchType === "Musician" && <div className='flex flex-col space-x-4 w-3/4 mb-4'>
+                    {(searchType === "Musician" || (searchType==="Opportunity" && searchForUser==="Musician")) && <div className='flex flex-col space-x-4 w-3/4 mb-4'>
                         <label className="text-[#5a5c69] text-[14px] leading-[20px] font-normal">Instruments</label>
                         <Select 
                             isMulti
@@ -220,7 +292,7 @@ const Homepage = () => {
                         </div>
                     </div>
 
-                    {searchType === "Musician" && 
+                    {(searchType === "Musician" || (searchType === "Opportunity" && searchForUser === "Musician"))&& 
                     <div className='grid grid-cols-3 col-span-4 mb-4'>
                         <div className='flex flex-col space-x-4 w-3/4'>
                             <label className="text-[#5a5c69] text-[14px] leading-[20px] font-normal" htmlFor='gender'>Gender</label>
@@ -282,9 +354,9 @@ const Homepage = () => {
                 </form>
             </div>
             {/* search results */}
-            {searchResults.length !== 0 && 
+            {searchUsersResults.length !== 0 && 
              <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
-                {searchResults.map((result, index) => (
+                {searchUsersResults.map((result, index) => (
                     <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToUser(searchType.toLowerCase(), result._id, result)}>
                         <div className="flex justify-between">
                             <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.username}</h2>
@@ -306,6 +378,28 @@ const Homepage = () => {
                     </div>
                 ))}
             </div>}
+            {searchOpportunitiesResults.length !== 0 && 
+                <div className='grid grid-cols-2 gap-6 px-16 mt-[25px]'>
+                    {searchOpportunitiesResults.map((result, index) => (
+                        <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToOpportunity(result._id, result)}>
+                            <div className="flex justify-between">
+                                <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.title.length > 35 ? result.title.substring(0, 35) + '...' : result.title}</h2>
+                                {result.publisher.profilePictureUrl === "" && 
+                                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200">
+                                        <FaUser fontSize={28} color="" />
+                                    </div>
+                                }
+                                {result.publisher.profilePictureUrl !== "" && <img src={result.publisher.profilePictureUrl} alt="" className='h-12 w-12 rounded-full' />}
+                            </div>
+                            <p className='italic text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.description.length > 200 ? result.description.substring(0, 200) + '...' : result.description}</p>
+                            <div className='flex items-center justify-between mt-2'>
+                                <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.location.city}, {result.location.state || result.location.country}</p>
+                                <p className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>{result.createdAt}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                }
 
 
         </div>

@@ -1,16 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { searchUser } from '../../services/registeredUserService';
+import { getFollowersCount, getFollowingCount, searchUser } from '../../services/registeredUserService';
 import Map from '../utils/Map';
 
 const RegisteredUser = ({type}) => {
     const { id } = useParams();
     const [user, setUser] = useState(null);
+    const [followersCount, setFollowersCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState(0);
     let navigate = useNavigate();
     
     const fetchUser = async () => {
         const result = await searchUser(type, id);
         setUser(result);
+    }
+
+    const fetchFollowersCount = async () => {
+        const followers = await getFollowersCount(type, id);
+        setFollowersCount(followers);
+    }
+
+    const fetchFollowingCount = async () => {
+        const following = await getFollowingCount(type, id);
+        setFollowingCount(following);
     }
 
     let location = useLocation();
@@ -20,6 +32,9 @@ const RegisteredUser = ({type}) => {
         } else {
             fetchUser();
         }
+        fetchFollowersCount();
+        if (type === "musician")
+           fetchFollowingCount();
     }, [location, id]);
 
     const handleOpportunityClick = (_id) => {
@@ -56,7 +71,7 @@ const RegisteredUser = ({type}) => {
                                 ))}
                             </div>
                         </div>
-                        <div className="col-span-2 mb-8">
+                        {type === "musician" && <div className="col-span-2 mb-8">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full text-right'>Instruments</h2>
                             <div className="flex flex-row-reverse flex-wrap gap-x-4 gap-y-2">
                                 {user.instruments.map((instrument, index) => (
@@ -65,20 +80,47 @@ const RegisteredUser = ({type}) => {
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                        <div className="col-span-4 flex-col mb-8">
+                        </div>}
+                        {type==="musician" && <div className="col-span-4 flex-col mb-8">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Age</h2>
                             <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.age || "-"}</p>
+                        </div>}
+                        <div className="col-span-4 flex-col mb-8">
+                            <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Followers</h2>
+                            <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{followersCount || "-"}</p>
                         </div>
+                        {type === "musician" && 
+                            <div className="col-span-4 flex-col mb-8">
+                                <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Following</h2>
+                                <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{followingCount || "-"}</p>
+                            </div>
+                        }
+                        {type === "band" && 
+                            <>
+                                <div className="col-span-4 flex-col mb-8">
+                                    <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Members</h2>
+                                </div>
+
+                                <div className="col-span-2 flex-col mb-8">
+                                    <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Years Together</h2>
+                                    <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.yearsTogether || "-"}</p>
+                                </div>
+                                
+                                <div className="col-span-2 flex-col mb-8 text-right">
+                                    <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Gigs Played</h2>
+                                    <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.gigsPlayed || "-"}</p>
+                                </div>
+                            </>
+                        }
                         <div className="col-span-1 flex-col mb-8">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Account created</h2>
                             <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.creationDateTime || "-"}</p>
                         </div>
-                        <div className="col-span-1 flex-col mb-8">
+                        <div className="col-span-2 flex-col mb-8 text-center">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Account last modified</h2>
                             <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.lastUpdateDateTime || "-"}</p>
                         </div>
-                        <div className="col-span-1 flex-col mb-8">
+                        <div className="col-span-1 flex-col mb-8 text-right">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Account last login</h2>
                             <p className='italic text-[#5a5c69] text-[18px] leading-[20px] font-normal'>{user.lastLoginDateTime || "-"}</p>
                         </div>
@@ -88,7 +130,7 @@ const RegisteredUser = ({type}) => {
                                 <p className='text-red-500 text-[20px] leading-[24px] font-bold'>Location</p>
                                 <p className=''>{user.location.city}, {user.location.country}</p>
                             </div>
-                            <Map user={user} className=""/>
+                            <Map entity={user} className=""/>
                         </div> 
 
                         <div className='col-span-4 mb-8'>
