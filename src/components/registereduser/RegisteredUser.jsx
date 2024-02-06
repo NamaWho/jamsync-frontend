@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { getFollowersCount, getFollowingCount, searchUser } from '../../services/registeredUserService';
+import { checkFollow, getFollowersCount, getFollowingCount, getMembers, searchUser } from '../../services/registeredUserService';
 import Map from '../utils/Map';
+import { decodeJWT } from '../../services/utils/jwt';
+import { follow, unfollow } from '../../services/registeredUserService';
+import toast from 'react-hot-toast';
 
 const RegisteredUser = ({type}) => {
     const { id } = useParams();
     const [user, setUser] = useState(null);
+    const [loggedUser, setLoggedUser] = useState(null);
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
+    const [following, setFollowing] = useState(false);
+    const [members, setMembers] = useState([]);
     let navigate = useNavigate();
     
     const fetchUser = async () => {
@@ -25,17 +31,45 @@ const RegisteredUser = ({type}) => {
         setFollowingCount(following);
     }
 
+    const fetchMembers = async () => {
+        const members = await getMembers(id);
+        setMembers(members);
+    }
+
+    const getAuthenticatedUser = () => {
+        // check if there is a token in the local storage
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = decodeJWT(token);
+            setLoggedUser(decoded);
+        }
+    }
+
+    const checkFollowing = async () => {
+        const res = await checkFollow(loggedUser.id, user._id, type);
+        if (res)
+            setFollowing(true);
+    }
+
     let location = useLocation();
     useEffect(() => {
+        fetchFollowersCount();
+        if (type === "musician")
+            fetchFollowingCount();
+        if (type === "band")
+            fetchMembers();
         if (location.state) {
             setUser(location.state.detail);
         } else {
             fetchUser();
         }
-        fetchFollowersCount();
-        if (type === "musician")
-           fetchFollowingCount();
+        getAuthenticatedUser();
     }, [location, id]);
+
+    useEffect(() => {
+        if (loggedUser && user)
+            checkFollowing();
+    }, [loggedUser, user]);
 
     const handleOpportunityClick = (_id) => {
         navigate(`/opportunities/${_id}`);
@@ -43,6 +77,22 @@ const RegisteredUser = ({type}) => {
 
     const handleApplicationClick = (_id) => {
         navigate(`/applications/${_id}`);
+    }
+
+    const handleFollowClick = async () => {
+        const res = await follow(loggedUser.id, user._id, type);
+        if (!res) 
+            setFollowing(true);
+        else 
+            toast.error('An error occurred while trying to follow the user');
+    }
+
+    const handleUnFollowClick = async () => {
+        const res = await unfollow(loggedUser.id, user._id, type);
+        if (!res) 
+            setFollowing(false);
+        else 
+            toast.error('An error occurred while trying to unfollow the user');
     }
 
     return (
@@ -56,6 +106,12 @@ const RegisteredUser = ({type}) => {
                     </div>
                     <h1 className='text-2xl font-bold'>{user.username}</h1>
                     <h2 className='text-lg font-bold text-red-500'>{user?.firstName} {user?.lastName}</h2>
+                    {(loggedUser && loggedUser.type === "musician" && loggedUser.id !== user._id) && 
+                        <div className='flex gap-x-4 mt-4'>
+                            {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
+                            {following && <button className='bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={handleUnFollowClick}>Unfollow</button>}
+                        </div>
+                    }
                     <div className="grid grid-cols-4 gap-x-4">
                         <div className='col-span-4 mb-8'>
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 '>About</h2>
@@ -74,7 +130,7 @@ const RegisteredUser = ({type}) => {
                         {type === "musician" && <div className="col-span-2 mb-8">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full text-right'>Instruments</h2>
                             <div className="flex flex-row-reverse flex-wrap gap-x-4 gap-y-2">
-                                {user.instruments.map((instrument, index) => (
+                                {user?.instruments?.map((instrument, index) => (
                                     <div  key={index} className='rounded-[8px] cursor-default border-t-[4px] border-green-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4'>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{instrument}</p>
                                     </div>
@@ -99,6 +155,13 @@ const RegisteredUser = ({type}) => {
                             <>
                                 <div className="col-span-4 flex-col mb-8">
                                     <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Members</h2>
+                                    <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                        {members.map((member, index) => (
+                                            <div key={index} onClick={() => navigate(`/musicians/${member._id}`)} className='rounded-[8px] cursor-pointer border-t-[4px] border-yellow-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/6'>
+                                                <p className='text-[#5a5c69] text-[13px] font-normal'>{member.username}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="col-span-2 flex-col mb-8">
