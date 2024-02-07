@@ -158,7 +158,6 @@ const Signup = () => {
                             onChange={(e) => setUsername(e.target.value)}
                             required
                         />
-                    
                     </div>
 
                     <div className='flex flex-col space-x-4 mb-[10px]'>
@@ -237,11 +236,6 @@ const Signup = () => {
                             <MdLocationCity />
                             <label className="font-bold" htmlFor="location">City</label>
                         </div>
-                        {/* <Select
-                            value={locationOptions.find(option => option.value.toUpperCase() === locationLabel)}
-                            onChange={option => handleLocationClick(option.value)}
-                            options={locationOptions}
-                        /> */}
                         <Select
                             value={locationsProposed.find(option => option.value === location)}
                             onChange={handleLocationChange}

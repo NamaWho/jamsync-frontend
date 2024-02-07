@@ -49,6 +49,8 @@ const RegisteredUser = ({type}) => {
         const res = await checkFollow(loggedUser.id, user._id, type);
         if (res)
             setFollowing(true);
+        else 
+            setFollowing(false);
     }
 
     let location = useLocation();
@@ -95,19 +97,25 @@ const RegisteredUser = ({type}) => {
             toast.error('An error occurred while trying to unfollow the user');
     }
 
+    const handleEditProfile = () => {
+        navigate(`/edit/${type}`, {state: { detail: user }});
+    }
+
     return (
         <>
         {user &&
             <div className='px-[25px] pt-20 pb-[40px]'>
-                <div className='rounded-[18px] flex flex-col items-center justify-between shadow-md bg-white px-80'>
+                <div className={`rounded-[18px] flex flex-col items-center justify-between shadow-md bg-white px-80 border-t-[4px] ${type==="musician" ? "border-red-500" : "border-blue-500"}`}>
                     <div className="relative -top-12">
                         {user.profilePictureUrl === "" && <div className='w-40 h-40 rounded-full bg-white shadow-lg'></div>}
-                        {user.profilePictureUrl !== "" && <img src={user.profilePictureUrl} alt='profile' className='h-40 w-40 rounded-full border border-red-500 border-[4px] shadow-lg'/>}
+                        {user.profilePictureUrl !== "" && <img src={user.profilePictureUrl} alt='profile' className={`h-40 w-40 rounded-full border ${type === "musician" ? "border-red-500" : "border-blue-500"} border-[4px] shadow-lg bg-white`}/>}
                     </div>
                     <h1 className='text-2xl font-bold'>{user.username}</h1>
                     <h2 className='text-lg font-bold text-red-500'>{user?.firstName} {user?.lastName}</h2>
+                    <h3 className='text-lg font-bold text-[#5a5c69]'>{type==="musician" ? "Musician":"Band"}</h3>
+                    {loggedUser.id === user._id && <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>}
                     {(loggedUser && loggedUser.type === "musician" && loggedUser.id !== user._id) && 
-                        <div className='flex gap-x-4 mt-4'>
+                        <div className='flex gap-x-4 mt-2'>
                             {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
                             {following && <button className='bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={handleUnFollowClick}>Unfollow</button>}
                         </div>

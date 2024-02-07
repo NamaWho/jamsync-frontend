@@ -10,6 +10,16 @@ export let searchUser = async (type, id) => {
   }
 };
 
+export const updateUser = async (user, type) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/${type}s/${user._id}`;
+    const response = await axios.put(url, user);
+    return response.data.payload;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export const getFollowersCount = async (type, id) => {
   try {
     const url = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}/followers`;

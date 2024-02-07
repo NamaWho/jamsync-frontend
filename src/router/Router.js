@@ -8,6 +8,7 @@ import Signup from "../components/signup/Signup";
 import Homepage from "../components/homepage/Homepage";
 import RegisteredUser from "../components/registereduser/RegisteredUser";
 import Opportunity from "../components/opportunity/Opportunity";
+import Edit from "../components/edit/Edit";
 
 const Router = () => {
   return (
@@ -21,6 +22,9 @@ const Router = () => {
           <Route path="/musicians/:id" element={<RegisteredUser type="musician"/>} />
           <Route path="/bands/:id" element={<RegisteredUser type="band"/>} />
           <Route path="/opportunities/:id" element={<Opportunity />} />
+          {/* protected rout for edit */}
+          <Route path="/edit/musician" element={<Edit type="musician"/>} />
+          <Route path="/edit/band" element={<Edit type="band"/>} />
           <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
       </BrowserRouter>

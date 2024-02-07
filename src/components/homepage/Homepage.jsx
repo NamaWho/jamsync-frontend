@@ -8,6 +8,10 @@ import { searchUsers, searchOpportunities } from '../../services/homepageService
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 import { decodeJWT } from '../../services/utils/jwt';
+import baseGenres from '../../assets/genres.js';
+import baseInstruments from '../../assets/instruments.js';
+import CreateOpportunityForm from './CreateOpportunityForm';
+import SuggestedOpportunities from './SuggestedOpportunities';
 
 const Homepage = () => {
     const [open, setOpen] = useState(false)
@@ -42,25 +46,16 @@ const Homepage = () => {
     const [searchUsersResults, setSearchUsersResults] = useState([]);
     const [searchOpportunitiesResults, setSearchOpportunitiesResults] = useState([]);
 
-    const availableGenres = [
-        "Alternative",
-        "Blues",
-        "Classical",
-        "Country",
-        "Electronic",
-        "Folk",
-    ] 
+    const availableGenres = baseGenres
     const genreOptions = availableGenres.map(genre => ({ value: genre, label: genre }));
 
-    const availableInstruments = [
-        "Acoustic Guitar",
-        "Bass Guitar",
-        "Drums",
-        "Electric Guitar",
-        "Keyboard",
-        "Piano"
-    ]
+    const availableInstruments = baseInstruments;
     const instrumentsOptions = availableInstruments.map(instrument => ({ value: instrument, label: instrument }));
+
+    const [isOpportunityFormOpen, setIsOpportunityFormOpen] = useState(false);
+    const [isSuggestedMusiciansOpen, setIsSuggestedMusiciansOpen] = useState(false);
+    const [isSuggestedBandsOpen, setIsSuggestedBandsOpen] = useState(false);
+    const [isSuggestedOpportunitiesOpen, setIsSuggestedOpportunitiesOpen] = useState(false);
 
     const getAuthenticatedUser = () => {
         // check if there is a token in the local storage
@@ -82,6 +77,12 @@ const Homepage = () => {
         localStorage.removeItem('token');
         // refresh
         window.location = '/';
+    }
+
+    const handleSearchTypeChange = (e) => {
+        setSearchType(e.target.value);
+        setSearchUsersResults([]);
+        setSearchOpportunitiesResults([]);
     }
 
     const handleSearchGenreChange = (selectedOptions) => {
@@ -106,6 +107,34 @@ const Homepage = () => {
 
     const navigateToOpportunity = (id, result) => {
         navigate(`/opportunities/${id}`, {state: { detail: result }});
+    }
+
+    const toggleCreateOpportunityForm = () => {
+        setIsOpportunityFormOpen(!isOpportunityFormOpen);
+        setIsSuggestedMusiciansOpen(false);
+        setIsSuggestedBandsOpen(false);
+        setIsSuggestedOpportunitiesOpen(false);
+    }
+
+    const toggleSuggestedMusicians = () => {
+        setIsSuggestedMusiciansOpen(!isSuggestedMusiciansOpen);
+        setIsOpportunityFormOpen(false);
+        setIsSuggestedBandsOpen(false);
+        setIsSuggestedOpportunitiesOpen(false);
+    }
+
+    const toggleSuggestedBands = () => {
+        setIsSuggestedBandsOpen(!isSuggestedBandsOpen);
+        setIsOpportunityFormOpen(false);
+        setIsSuggestedMusiciansOpen(false);
+        setIsSuggestedOpportunitiesOpen(false);
+    }
+
+    const toggleSuggestedOpportunities = () => {
+        setIsSuggestedOpportunitiesOpen(!isSuggestedOpportunitiesOpen);
+        setIsOpportunityFormOpen(false);
+        setIsSuggestedMusiciansOpen(false);
+        setIsSuggestedBandsOpen(false);
     }
 
     const handleSearch = async (e) => {
@@ -165,7 +194,7 @@ const Homepage = () => {
                     <div className='flex items-center gap-[20px]'>
                         <div className='flex items-center gap-[15px] relative border-l-[1px] pl-[25px]' onClick={showProfile} >
                             <p>{loggedUser.firstName} {loggedUser.lastName}</p>
-                            <div className='h-[50px] w-[50px] rounded-full bg-[#4E73DF] cursor-pointer flex items-center justify-center relative z-40' >
+                            <div className='h-[50px] w-[50px] rounded-full bg-white cursor-pointer flex items-center justify-center relative z-40' >
                                 {loggedUser.profilePictureUrl !== "" && <img src={loggedUser.profilePictureUrl} alt="" className='rounded-full' />}
                                 {loggedUser.profilePictureUrl === "" && <FaUser fontSize={28} color="white" />}
                             </div>
@@ -198,31 +227,50 @@ const Homepage = () => {
 
             {
                 loggedUser &&
-                <div className='grid grid-cols-3 gap-24 px-16 mt-[25px] pb-[15px]'>
-                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                <div className='grid grid-cols-4 gap-16 px-16 mt-[25px] pb-[15px]'>
+                    {loggedUser.type === "musician" &&
+                        <>
+                        <div onClick={toggleSuggestedMusicians} className={`h-24 rounded-[8px] ${isSuggestedMusiciansOpen ? "bg-blue-100 scale-[103%] shadow-lg" : "bg-white"} border-l-[4px] border-[#4E73DF] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out`}>
                         <div>
-                            <h2 className='text-[#B589DF] text-[11px] leading-[17px] font-bold'>FOR YOU...</h2>
+                            <h2 className='text-blue-500 text-[11px] leading-[17px] font-bold'>RECOMMENDED FOR YOU...</h2>
                             <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>MUSICIANS</h1>
                         </div>
                         <FaRegCalendarMinus fontSize={28} color="" />
 
-                    </div>
-                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#1CC88A] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
-                        <div>
-                            <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>
-                                FOR YOU...</h2>
-                            <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>BANDS</h1>
                         </div>
-                        <FaRegCalendarMinus fontSize={28} />
-                    </div>
-                    <div className=' h-[100px] rounded-[8px] bg-white border-l-[4px] border-[#36B9CC] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                        <div onClick={toggleSuggestedBands} className={`h-24 rounded-[8px] ${isSuggestedBandsOpen ? "bg-green-100 scale-[103%] shadow-lg" : "bg-white"} border-l-[4px] border-[#1CC88A] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out`}>
+                            <div>
+                                <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>
+                                RECOMMENDED FOR YOU...</h2>
+                                <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>BANDS</h1>
+                            </div>
+                            <FaRegCalendarMinus fontSize={28} />
+                        </div>
+                        </>
+                    }
+                    <div onClick={toggleSuggestedOpportunities} className={`${loggedUser.type !== "musician" && "col-span-2"} h-24 rounded-[8px] ${isSuggestedOpportunitiesOpen ? "bg-cyan-100 scale-[103%] shadow-lg" : "bg-white"} border-l-[4px] border-[#36B9CC] flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out`}>
                         <div>
-                            <h2 className='text-[#1cc88a] text-[11px] leading-[17px] font-bold'>FOR YOU... </h2>
+                            <h2 className='text-cyan-500 text-[11px] leading-[17px] font-bold'>RECOMMENDED FOR YOU... </h2>
                             <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>OPPORTUNITIES</h1>
                         </div>
                         <FaRegCalendarMinus fontSize={28} />
                     </div>
+                    <div onClick={toggleCreateOpportunityForm} className={`${loggedUser.type !== "musician" && "col-span-2"} h-24 rounded-[8px] ${isOpportunityFormOpen ? "bg-orange-100 scale-[103%] shadow-lg" : "bg-white"} border-l-[4px] border-orange-500 flex items-center justify-between px-[30px] cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out`}>
+                        <div>
+                            <h2 className='text-[#FF0000] text-[11px] leading-[17px] font-bold'>PUBLISH A NEW </h2>
+                            <h1 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-[5px]'>OPPORTUNITY</h1>
+                        </div>
+                        <FaRegCalendarMinus fontSize={28} />
+                    </div>
                 </div>
+            }
+            {isSuggestedMusiciansOpen && <></>}
+            {isSuggestedBandsOpen && <></>}
+            {isSuggestedOpportunitiesOpen && 
+                <SuggestedOpportunities user={loggedUser}/>
+            }
+            {isOpportunityFormOpen && 
+                <CreateOpportunityForm user={loggedUser} baseGenres={baseGenres} baseInstruments={baseInstruments} baseLocations={locations}/> 
             }
             {/* search form */}
             <div className='rounded-[8px] flex flex-col justify-between border-t-[4px] border-[#FF0000] mx-16 my-8 px-12 py-8 cursor-pointer hover:shadow-lg transform transition duration-300 ease-out bg-white'>
@@ -231,7 +279,7 @@ const Homepage = () => {
                 <form className='grid grid-cols-4'>
                     <div className='flex flex-col w-3/4 mb-4'>
                         <label htmlFor="type" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>Type</label>
-                        <select onChange={(e) => setSearchType(e.target.value)} name="type" id="type" className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal mb-[10px]'>
+                        <select onChange={(e) => handleSearchTypeChange(e)} name="type" id="type" className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal mb-[10px]'>
                             <option value="Musician">Musician</option>
                             <option value="Band">Band</option>
                             <option value="Opportunity">Opportunity</option>
@@ -357,9 +405,9 @@ const Homepage = () => {
             {searchUsersResults.length !== 0 && 
              <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
                 {searchUsersResults.map((result, index) => (
-                    <div key={index} className='h-40 rounded-[8px] bg-white border-l-[4px] border-[#4E73DF] flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToUser(searchType.toLowerCase(), result._id, result)}>
+                    <div key={index} className={`h-40 rounded-[8px] bg-white border-l-[4px] ${searchType === "Musician" ? "border-red-500" : "border-blue-500"} flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4`} onClick={() => navigateToUser(searchType.toLowerCase(), result._id, result)}>
                         <div className="flex justify-between">
-                            <h2 className='text-[#B589DF] text-[20px] leading-[24px] font-bold'>{result.username}</h2>
+                            <h2 className={`${searchType==="Musician" ? "text-red-500" : "text-blue-500"} text-[20px] leading-[24px] font-bold`}>{result.username}</h2>
                             {result.profilePictureUrl === "" && 
                                 <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200">
                                     <FaUser fontSize={28} color="" />
