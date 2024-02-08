@@ -84,7 +84,8 @@ const Opportunity = () => {
         {opportunity &&
             <div className='px-64 pt-20 pb-[40px]'>
                 <div className='rounded-[18px] flex flex-col items-center justify-between shadow-md bg-white p-8 border-t-[4px] border-red-500'>
-                    <h1 className='text-2xl font-bold mb-16'>{opportunity.title}</h1>
+                    <h4 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Opportunity for {opportunity.publisher.type.toLowerCase() === "musician" ? "Band":"Musician"}</h4>
+                    <h1 className='text-2xl font-bold mt-2 mb-16'>{opportunity.title}</h1>
                     {loggedUser && loggedUser.type !== opportunity.publisher.type.toLowerCase() && !opportunity.applications.some(app => app.applicant._id === loggedUser.id) &&
                         <div className='flex justify-center mb-8'>
                             <button className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-[8px]' onClick={toggleApplicationForm}>Apply</button>
@@ -189,6 +190,12 @@ const Opportunity = () => {
 
                     </div>
                 </div>
+                <button 
+                    onClick={() => navigate('/')} 
+                    className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                    >
+                    Home
+                </button>
             </div>
         }
         </>

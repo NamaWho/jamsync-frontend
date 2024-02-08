@@ -265,6 +265,12 @@ const Edit = ({type}) => {
                             <button type="submit" className='bg-[#4E73DF] h-[40px] w-full rounded-[5px] text-white font-bold'>Edit</button>
                         </form>              
                     </div>
+                    <button 
+                        onClick={() => navigate('/')} 
+                        className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                        >
+                        Home
+                    </button>
                 </div>
             }
         </>
