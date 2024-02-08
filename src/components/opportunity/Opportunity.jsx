@@ -73,6 +73,12 @@ const Opportunity = () => {
         }
     }
 
+    const handleApplicationClick = (applicantId, id) => {
+        if (loggedUser && (loggedUser.id === opportunity.publisher._id || loggedUser.id === applicantId)) {
+            navigate(`/applications/${id}`);
+        } 
+    }
+
     return (
         <>
         {opportunity &&
@@ -171,11 +177,11 @@ const Opportunity = () => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-4'>Applications</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
                                 {opportunity?.applications.map((application, index) => (
-                                    <div key={index} className={`rounded-[8px] cursor-default border-t-[4px] ${application.status ? "border-green-300" : "border-orange-300"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4`}>
+                                    <div key={index} className={`rounded-[8px] border-t-[4px] ${application.status ? "border-green-300" : "border-orange-300"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4 ${loggedUser && ((opportunity.publisher._id === loggedUser.id) || (application.applicant._id === loggedUser.id)) ? "cursor-pointer hover:scale-[103%] hover:shadow-lg" : "cursor-default"}`} onClick={() => handleApplicationClick(application.applicant._id, application._id)}>
                                         <p className='text-[#5a5c69] text-[13px] font-normal mt-2'>{application.applicant.username}</p>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{application.createdAt}</p>
                                         {application.applicant.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white border border-red-300 border-[1px] shadow-lg'></div>}
-                                        {application.applicant.profilePictureUrl !== "" && <img src={application.applicant.profilePictureUrl} alt='profile' className='absolute -top-5 h-10 w-10 rounded-full border border-red-300 border-[1px] shadow-lg'/>}
+                                        {application.applicant.profilePictureUrl !== "" && <img src={application.applicant.profilePictureUrl} alt='profile' className='absolute -top-5 h-10 w-10 bg-white rounded-full border border-red-300 border-[1px] shadow-lg'/>}
                                     </div>
                                 ))}
                             </div>

@@ -113,7 +113,7 @@ const RegisteredUser = ({type}) => {
                     <h1 className='text-2xl font-bold'>{user.username}</h1>
                     <h2 className='text-lg font-bold text-red-500'>{user?.firstName} {user?.lastName}</h2>
                     <h3 className='text-lg font-bold text-[#5a5c69]'>{type==="musician" ? "Musician":"Band"}</h3>
-                    {loggedUser.id === user._id && <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>}
+                    {(loggedUser && loggedUser.id === user._id) && <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>}
                     {(loggedUser && loggedUser.type === "musician" && loggedUser.id !== user._id) && 
                         <div className='flex gap-x-4 mt-2'>
                             {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
