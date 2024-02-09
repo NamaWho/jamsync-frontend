@@ -7,6 +7,7 @@ import { decodeJWT } from '../../services/utils/jwt';
 import { sendApplication } from '../../services/applicationService';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
+import { deleteOpportunityById } from '../../services/opportunityService';
 
 const Opportunity = () => {
     const { id } = useParams();
@@ -79,6 +80,17 @@ const Opportunity = () => {
         } 
     }
 
+    const handleOpportunityDelete = async () => {
+        const error = await deleteOpportunityById(opportunity._id);
+        if (!error) {
+            toast.success('Opportunity deleted successfully');
+            navigate('/');
+        } else {
+            toast.error('Error deleting opportunity');
+        }
+    }
+
+
     return (
         <>
         {opportunity &&
@@ -86,6 +98,11 @@ const Opportunity = () => {
                 <div className='rounded-[18px] flex flex-col items-center justify-between shadow-md bg-white p-8 border-t-[4px] border-red-500'>
                     <h4 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Opportunity for {opportunity.publisher.type.toLowerCase() === "musician" ? "Band":"Musician"}</h4>
                     <h1 className='text-2xl font-bold mt-2 mb-16'>{opportunity.title}</h1>
+                    {loggedUser && loggedUser.id === opportunity.publisher._id &&
+                        <div className='flex justify-center mb-8'>
+                            <button className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-[8px]' onClick={handleOpportunityDelete}>Delete</button>
+                        </div>
+                    }
                     {loggedUser && loggedUser.type !== opportunity.publisher.type.toLowerCase() && !opportunity.applications.some(app => app.applicant._id === loggedUser.id) &&
                         <div className='flex justify-center mb-8'>
                             <button className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-[8px]' onClick={toggleApplicationForm}>Apply</button>
@@ -108,7 +125,7 @@ const Opportunity = () => {
                     <div className="grid grid-cols-4 gap-x-4">
                         <div className='col-span-4 mb-8'>
                             <h2 className='text-red-500 mr-4 text-[20px] leading-[24px] font-bold mb-2 inline align-top'>Publisher</h2>
-                            <div onClick={() => navigateToUser(opportunity.publisher.type.toLowerCase(), opportunity.publisher._id)} className='relative rounded-[8px] cursor-pointer border-t-[4px] border-red-400 inline-flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-2 px-14'>
+                            <div onClick={() => navigateToUser(opportunity.publisher.type.toLowerCase(), opportunity.publisher._id)} className='relative rounded-[8px] cursor-pointer border-t-[4px] border-red-500 inline-flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-2 px-14'>
                                 <p className='text-[#5a5c69] text-[18px] leading-[20px] font-normal mt-5'>{opportunity.publisher.type} - {opportunity.publisher.username}</p>
                                 {opportunity.publisher.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white shadow-lg'></div>}
                                 {opportunity.publisher.profilePictureUrl !== "" && <img src={opportunity.publisher.profilePictureUrl} alt='profile' className='absolute -top-5 h-10 w-10 rounded-full border border-red-300 border-[1px] shadow-lg bg-white'/>}
@@ -130,7 +147,7 @@ const Opportunity = () => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Genres</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
                                 {opportunity.genres.map((genre, index) => (
-                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-blue-200 flex items-center justify-center shadow-md transform transition duration-300 ease-out w-1/4 '>
+                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-blue-400 flex items-center justify-center shadow-md transform transition duration-300 ease-out w-1/4 '>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{genre}</p>
                                     </div>
                                 ))}
@@ -140,7 +157,7 @@ const Opportunity = () => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full text-right'>Instruments</h2>
                             <div className="flex flex-row-reverse flex-wrap gap-x-4 gap-y-2">
                                 {opportunity?.instruments?.map((instrument, index) => (
-                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-green-200 flex items-center justify-center shadow-md transform transition duration-300 ease-out w-1/4'>
+                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-green-400 flex items-center justify-center shadow-md transform transition duration-300 ease-out w-1/4'>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{instrument}</p>
                                     </div>
                                 ))}
@@ -178,7 +195,7 @@ const Opportunity = () => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-4'>Applications</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
                                 {opportunity?.applications.map((application, index) => (
-                                    <div key={index} className={`rounded-[8px] border-t-[4px] ${application.status ? "border-green-300" : "border-orange-300"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4 ${loggedUser && ((opportunity.publisher._id === loggedUser.id) || (application.applicant._id === loggedUser.id)) ? "cursor-pointer hover:scale-[103%] hover:shadow-lg" : "cursor-default"}`} onClick={() => handleApplicationClick(application.applicant._id, application._id)}>
+                                    <div key={index} className={`rounded-[8px] border-t-[4px] ${application.status ? "border-green-400" : "border-orange-400"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4 ${loggedUser && ((opportunity.publisher._id === loggedUser.id) || (application.applicant._id === loggedUser.id)) ? "cursor-pointer hover:scale-[103%] hover:shadow-lg" : "cursor-default"}`} onClick={() => handleApplicationClick(application.applicant._id, application._id)}>
                                         <p className='text-[#5a5c69] text-[13px] font-normal mt-2'>{application.applicant.username}</p>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{application.createdAt}</p>
                                         {application.applicant.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white border border-red-300 border-[1px] shadow-lg'></div>}

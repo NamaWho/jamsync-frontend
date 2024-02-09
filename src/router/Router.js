@@ -10,6 +10,7 @@ import RegisteredUser from "../components/registereduser/RegisteredUser";
 import Opportunity from "../components/opportunity/Opportunity";
 import Edit from "../components/edit/Edit";
 import Application from "../components/application/Application";
+import NotFound from "../components/utils/NotFound";
 
 const Router = () => {
   return (
@@ -27,7 +28,8 @@ const Router = () => {
           {/* protected rout for edit */}
           <Route path="/edit/musician" element={<Edit type="musician"/>} />
           <Route path="/edit/band" element={<Edit type="band"/>} />
-          <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </div>

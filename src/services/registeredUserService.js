@@ -20,6 +20,17 @@ export const updateUser = async (user, type) => {
   }
 }
 
+export const deleteUserById = async (type, id) => {
+  try {
+    let response = await axios.delete(
+      `${process.env.REACT_APP_BASE_URI}/${type}s/${id}`
+    );
+    return response.data.error;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export const getFollowersCount = async (type, id) => {
   try {
     const url = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}/followers`;

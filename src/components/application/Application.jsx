@@ -3,6 +3,7 @@ import { getApplicationById } from '../../services/applicationService';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { decodeJWT } from '../../services/utils/jwt';
+import { deleteApplicationById, acceptApplicationById } from '../../services/applicationService';
 
 const Application = () => {
 
@@ -24,7 +25,7 @@ const Application = () => {
                 setApplication(response.applications[0]);
             }
         } else {
-            navigate("/opportunities"+response._id);
+            navigate("/404");
         }
     }
 
@@ -48,6 +49,27 @@ const Application = () => {
         navigate(`/${type}s/${id}`);
     }
 
+    const handleDeleteApplication = async () => {
+        const error = await deleteApplicationById(application._id, opportunity._id);
+        if(!error){
+            toast.success("Application deleted successfully");
+            navigate("/");
+        } else {
+            toast.error("Error deleting application");
+        }
+    }
+
+    const handleAcceptApplication = async () => {
+        const error = await acceptApplicationById(application._id);
+        if(!error){
+            toast.success("Application accepted successfully");
+            setApplication({...application, status: "accepted"});
+        } else {
+            toast.error("Error accepting application");
+        }
+    }
+
+
     return (
         <>
             {opportunity && ((opportunity.publisher._id === loggedUser.id) || (opportunity.applications[0].applicant._id === loggedUser.id)) &&
@@ -57,6 +79,10 @@ const Application = () => {
                             <h4 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Opportunity for {opportunity.publisher.type.toLowerCase() === "musician" ? "Band":"Musician"}</h4>
                             <h1 className='text-2xl font-bold mt-2 mb-4'>{opportunity.title}</h1>
                             <h3 className={`text-[20px] leading-[24px] font-bold mb-8 ${application.status ? "text-green-500":"text-orange-500"}`}>APPLICATION {application.status ? "ACCEPTED": "PENDING"}</h3>
+                            {!application.status && loggedUser.id === application.applicant._id && <button onClick={handleDeleteApplication} className='bg-red-400 h-14 py-4 px-6 rounded-[16px] text-white font-bold hover:scale-[103%] hover:bg-red-500 mb-8'>Delete Application</button>}
+                            {!application.status && loggedUser.id === opportunity.publisher._id && <button onClick={handleAcceptApplication} className='bg-green-400 h-14 py-4 px-6 rounded-[16px] text-white font-bold hover:scale-[103%] hover:bg-green-500 mb-8'>Accept Application</button>}
+                            {application.status && loggedUser.id === opportunity.publisher._id && <h2 className='text-[20px] leading-[24px] font-bold text-green-500 mb-8'>Email: {application.applicant.contactEmail}</h2>}
+
                             <div className={`grid grid-cols-4 gap-x-4 shadow-md rounded-[8px] px-4 py-8 border-2`}>
                                 <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-8'>APPLICATION</h2>
                                 <div className='col-span-4 mb-8'>

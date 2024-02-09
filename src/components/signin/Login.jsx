@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { login } from '../../services/authService';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [type, setType] = useState('Musician');
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -14,7 +16,10 @@ const Login = () => {
         // set the token in the local storage
         if (!response.error){
             localStorage.setItem('token', response.payload);
-            window.location = '/';
+            if (type === 'Admin') 
+                navigate('/admin');
+            else
+                navigate('/');
         } else {
             toast.error(response.error);
         }
@@ -51,6 +56,12 @@ const Login = () => {
                     <button type="submit" className='bg-[#4E73DF] h-[40px] w-full rounded-[5px] text-white font-bold'>Login</button>
                 </form>
             </div>
+            <button 
+                onClick={() => navigate('/')} 
+                className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                >
+                Home
+            </button>
         </div>
     )
 }

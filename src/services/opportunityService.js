@@ -21,6 +21,16 @@ export const createOpportunity = async (data) => {
     }
 }
 
+export const deleteOpportunityById = async (id) => {
+    try {
+        const url = `${process.env.REACT_APP_BASE_URI}/opportunities/${id}`;
+        const response = await axios.delete(url);
+        return response.data.error;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export const getSuggestedOpportunities = async (id, type) => {
     try {
         // retrieve user

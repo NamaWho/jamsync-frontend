@@ -36,3 +36,4 @@ export let register = async (type, payload) => {
     console.error(error);
   }
 };
+

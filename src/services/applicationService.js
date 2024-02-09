@@ -11,6 +11,26 @@ export const getApplicationById = async (id) => {
   }
 };
 
+export const deleteApplicationById = async (id, opportunityId) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/applications/${id}?opportunityId=${opportunityId}`;
+    const response = await axios.delete(url);
+    return response.data.error;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const acceptApplicationById = async (id) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/applications/${id}/accept`;
+    const response = await axios.post(url);
+    return response.data.error;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const sendApplication = async (opportunityId, data) => {
   try {
     const url = `${process.env.REACT_APP_BASE_URI}/applications/?opportunityId=${opportunityId}`;

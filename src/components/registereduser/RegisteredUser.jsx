@@ -5,6 +5,7 @@ import Map from '../utils/Map';
 import { decodeJWT } from '../../services/utils/jwt';
 import { follow, unfollow } from '../../services/registeredUserService';
 import toast from 'react-hot-toast';
+import { deleteUserById } from '../../services/registeredUserService';
 
 const RegisteredUser = ({type}) => {
     const { id } = useParams();
@@ -101,6 +102,17 @@ const RegisteredUser = ({type}) => {
         navigate(`/edit/${type}`, {state: { detail: user }});
     }
 
+    const handleDeleteProfile = async () => {
+        const result = await deleteUserById(loggedUser.type.toLowerCase(), loggedUser.id);
+        if (!result) {
+            toast.success("Profile deleted successfully");
+            localStorage.removeItem('token');
+            navigate("/");
+        } else {
+            toast.error("Error deleting profile");
+        }
+    }
+
     return (
         <>
         {user &&
@@ -113,7 +125,12 @@ const RegisteredUser = ({type}) => {
                     <h1 className='text-2xl font-bold'>{user.username}</h1>
                     <h2 className='text-lg font-bold text-red-500'>{user?.firstName} {user?.lastName}</h2>
                     <h3 className='text-lg font-bold text-[#5a5c69]'>{type==="musician" ? "Musician":"Band"}</h3>
-                    {(loggedUser && loggedUser.id === user._id) && <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>}
+                    {(loggedUser && loggedUser.id === user._id) && 
+                        <div className='flex gap-x-4 mt-2'>
+                            <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>
+                            <button className='bg-gray-300 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={() => handleDeleteProfile()}>Delete profile</button>
+                        </div>
+                    }
                     {(loggedUser && loggedUser.type === "musician" && loggedUser.id !== user._id) && 
                         <div className='flex gap-x-4 mt-2'>
                             {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
@@ -129,7 +146,7 @@ const RegisteredUser = ({type}) => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Genres</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
                                 {user.genres.map((genre, index) => (
-                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-blue-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4 '>
+                                    <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-blue-400 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4 '>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{genre}</p>
                                     </div>
                                 ))}
@@ -139,7 +156,7 @@ const RegisteredUser = ({type}) => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full text-right'>Instruments</h2>
                             <div className="flex flex-row-reverse flex-wrap gap-x-4 gap-y-2">
                                 {user?.instruments?.map((instrument, index) => (
-                                    <div  key={index} className='rounded-[8px] cursor-default border-t-[4px] border-green-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4'>
+                                    <div  key={index} className='rounded-[8px] cursor-default border-t-[4px] border-green-400 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4'>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{instrument}</p>
                                     </div>
                                 ))}
@@ -208,7 +225,7 @@ const RegisteredUser = ({type}) => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Oppportunities published</h2>
                             <div className="flex flex-col gap-y-2">
                                 {user.opportunities.map((opportunity, index) => (
-                                    <div key={index} className='rounded-[8px] px-8 py-2 cursor-pointer border-t-[4px] border-purple-300 flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out' onClick={() => handleOpportunityClick(opportunity._id)}>
+                                    <div key={index} className={`rounded-[8px] px-8 py-2 cursor-pointer border-l-[4px] ${type === "musician" ? "border-red-500" : "border-blue-500"} flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out`} onClick={() => handleOpportunityClick(opportunity._id)}>
                                         {/* must provide title and date of creation */}
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{opportunity.title}</p>
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{opportunity.createdAt.length > 10 ? opportunity.createdAt.substring(0, 10) : opportunity.createdAt}</p>
@@ -221,7 +238,7 @@ const RegisteredUser = ({type}) => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Applications made</h2>
                             <div className="flex flex-col gap-y-2">
                                 {user.applications.map((application, index) => (
-                                    <div key={index} className='rounded-[8px] px-8 py-2 cursor-pointer border-t-[4px] border-purple-300 flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out' onClick={() => handleApplicationClick(application._id)}>
+                                    <div key={index} className={`rounded-[8px] px-8 py-2 cursor-pointer border-l-[4px] ${type === "musician" ? "border-red-500" : "border-blue-500"} flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out`} onClick={() => handleApplicationClick(application._id)}>
                                         {/* must provide title and date of creation */}
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{application.title}</p>
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{application.createdAt > 10 ? application.createdAt.substring(0, 10) : application.createdAt}</p>
@@ -229,7 +246,6 @@ const RegisteredUser = ({type}) => {
                                 ))}
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <button 
