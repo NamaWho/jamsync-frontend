@@ -9,3 +9,12 @@ export const fetchTop5Publishers = async () => {
         console.log('Error fetching top 5 publishers', error);
     }
 }
+
+export const fetchTop5AppliedOpportunities = async () => {
+    try {
+        const res = await axios.get(process.env.REACT_APP_BASE_URI + '/opportunities/topAppliedOpportunities');
+        return res.data.payload;
+    } catch (error) {
+        console.log('Error fetching top 5 applied opportunities', error);
+    }
+}

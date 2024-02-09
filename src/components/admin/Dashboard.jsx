@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { FaRegCalendarMinus } from "react-icons/fa"
-import { fetchTop5Publishers } from '../../services/analyticsService';
+import { fetchTop5Publishers, fetchTop5AppliedOpportunities } from '../../services/analyticsService';
 
 const Dashboard = () => {
 
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [top5Publishers, setTop5Publishers] = useState([]);
+    const [top5AppliedOpportunities, setTop5AppliedOpportunities] = useState([]);
+    const navigate = useNavigate();
 
     const fetchAnalytics = async () => {
         const top5Publishers = await fetchTop5Publishers();
         console.log(top5Publishers);
         setTop5Publishers(top5Publishers);
+
+        const top5AppliedOpportunities = await fetchTop5AppliedOpportunities();
+        console.log(top5AppliedOpportunities);
+        setTop5AppliedOpportunities(top5AppliedOpportunities);
     }
 
     useEffect(() => {
@@ -67,7 +74,7 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {top5Publishers.map((publisher, index) => (
+                            {top5Publishers?.map((publisher, index) => (
                                 <tr key={index} className=''>
                                     <td className='border px-4 py-2'>{index + 1}</td>
                                     <td className='border px-4 py-2'>
@@ -79,6 +86,30 @@ const Dashboard = () => {
                                     <td className='border px-4 py-2'>{publisher.totalApplications}</td>
                                     <td className='border px-4 py-2'>{publisher.acceptedApplications}</td>
                                     <td className='border px-4 py-2'>{publisher.acceptanceRate}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    
+                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-8'>TOP 5 APPLIED OPPORTUNITIES</h2>
+                    <table className='table-auto w-full mt-4'>
+                        <thead>
+                            <tr>
+                                <th className='px-4 py-2'></th>
+                                <th className='px-4 py-2'>Title</th>
+                                <th className='px-4 py-2'>For</th>
+                                <th className='px-4 py-2'>Total Applications</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {top5AppliedOpportunities?.map((opportunity, index) => (
+                                <tr key={index} className=''>
+                                    <td className='border px-4 py-2'>{index + 1}</td>
+                                    <td className='border px-4 py-2 underline hover:text-blue-500 hover:cursor-pointer' onClick={() => navigate("/opportunities/"+ opportunity._id)}>
+                                        {opportunity.title}
+                                    </td>
+                                    <td className='border px-4 py-2'>{opportunity.publisher.type === "Band" ? "Musicians" : "Bands"}</td>
+                                    <td className='border px-4 py-2'>{opportunity.numApplications}</td>
                                 </tr>
                             ))}
                         </tbody>

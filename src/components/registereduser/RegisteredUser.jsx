@@ -6,6 +6,7 @@ import { decodeJWT } from '../../services/utils/jwt';
 import { follow, unfollow } from '../../services/registeredUserService';
 import toast from 'react-hot-toast';
 import { deleteUserById } from '../../services/registeredUserService';
+import { banUserById } from '../../services/authService';
 
 const RegisteredUser = ({type}) => {
     const { id } = useParams();
@@ -113,6 +114,16 @@ const RegisteredUser = ({type}) => {
         }
     }
 
+    const handleBanProfile = async () => {
+        const error = await banUserById(type.toLowerCase(), user._id);
+        if (!error) {
+            toast.success("User banned successfully");
+            navigate("/admin");
+        } else {
+            toast.error("Error banning user");
+        }
+    }
+
     return (
         <>
         {user &&
@@ -125,6 +136,8 @@ const RegisteredUser = ({type}) => {
                     <h1 className='text-2xl font-bold'>{user.username}</h1>
                     <h2 className='text-lg font-bold text-red-500'>{user?.firstName} {user?.lastName}</h2>
                     <h3 className='text-lg font-bold text-[#5a5c69]'>{type==="musician" ? "Musician":"Band"}</h3>
+                    {loggedUser?.type === "admin" && !user.isBanned && <button className='bg-orange-500 text-white rounded-md px-4 py-2 mt-2 hover:bg-red-600 transition duration-300 ease-out' onClick={() => handleBanProfile()}>Ban user</button>}
+                    {user.isBanned && <p className='text-red-500 text-lg font-bold mt-2'>Banned</p>}
                     {(loggedUser && loggedUser.id === user._id) && 
                         <div className='flex gap-x-4 mt-2'>
                             <button className='bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-out' onClick={() => handleEditProfile()}>Edit profile</button>
@@ -248,12 +261,18 @@ const RegisteredUser = ({type}) => {
                         </div>
                     </div>
                 </div>
-                <button 
-                    onClick={() => navigate('/')} 
+                {loggedUser.type !== "admin" &&  <button 
+                        onClick={() => navigate('/')} 
+                        className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                        >
+                        Home
+                </button>}
+                {loggedUser.type === "admin" &&  <button 
+                    onClick={() => navigate('/admin')} 
                     className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                     >
-                    Home
-                </button>
+                    Admin board
+                </button>}
             </div>
         }
         </>

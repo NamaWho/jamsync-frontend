@@ -37,3 +37,13 @@ export let register = async (type, payload) => {
   }
 };
 
+export const banUserById = async (type, id) => {
+  try {
+    let response = await axios.post(
+      `${process.env.REACT_APP_BASE_URI}/auth/${id}/ban?type=${type}`
+    );
+    return response.data.error;
+  } catch (error) {
+    console.error(error);
+  }
+};
