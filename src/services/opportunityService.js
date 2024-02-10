@@ -46,3 +46,19 @@ export const getSuggestedOpportunities = async (id, type) => {
         console.error(error);
     }
 }
+
+export const getSuggestedOpportunitiesByNetwork = async (id, type) => {
+    try {
+        // retrieve user
+        const userUrl = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}`;
+        const userResponse = await axios.get(userUrl);
+        const user = userResponse.data.payload;
+
+        // retrieve suggested opportunities by network
+        const url = `${process.env.REACT_APP_BASE_URI}/${type}s/suggestedOpportunitiesByFollowers`;
+        const response = await axios.post(url, user);
+        return response.data.payload;
+    } catch (error) {
+        console.error(error);
+    }
+}

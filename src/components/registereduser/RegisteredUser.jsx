@@ -144,7 +144,7 @@ const RegisteredUser = ({type}) => {
                             <button className='bg-gray-300 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={() => handleDeleteProfile()}>Delete profile</button>
                         </div>
                     }
-                    {(loggedUser && loggedUser.type === "musician" && loggedUser.id !== user._id) && 
+                    {(loggedUser && loggedUser?.type === "musician" && loggedUser.id !== user._id) && 
                         <div className='flex gap-x-4 mt-2'>
                             {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
                             {following && <button className='bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={handleUnFollowClick}>Unfollow</button>}
@@ -261,13 +261,13 @@ const RegisteredUser = ({type}) => {
                         </div>
                     </div>
                 </div>
-                {loggedUser.type !== "admin" &&  <button 
+                {(!loggedUser || loggedUser?.type !== "admin") &&  <button 
                         onClick={() => navigate('/')} 
                         className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                         >
                         Home
                 </button>}
-                {loggedUser.type === "admin" &&  <button 
+                {loggedUser?.type === "admin" &&  <button 
                     onClick={() => navigate('/admin')} 
                     className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                     >

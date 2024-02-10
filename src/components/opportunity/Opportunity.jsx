@@ -75,7 +75,7 @@ const Opportunity = () => {
     }
 
     const handleApplicationClick = (applicantId, id) => {
-        if (loggedUser && (loggedUser.id === opportunity.publisher._id || loggedUser.id === applicantId)) {
+        if (loggedUser && (loggedUser.id === opportunity.publisher._id || loggedUser.id === applicantId || loggedUser.type === "admin")) {
             navigate(`/applications/${id}`);
         } 
     }
@@ -103,7 +103,7 @@ const Opportunity = () => {
                             <button className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-[8px]' onClick={handleOpportunityDelete}>Delete</button>
                         </div>
                     }
-                    {loggedUser && loggedUser.type !== opportunity.publisher.type.toLowerCase() && !opportunity.applications.some(app => app.applicant._id === loggedUser.id) &&
+                    {loggedUser && loggedUser.type !== opportunity.publisher.type.toLowerCase() && !opportunity.applications.some(app => app.applicant._id === loggedUser.id) && loggedUser.type !== "admin" &&
                         <div className='flex justify-center mb-8'>
                             <button className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-[8px]' onClick={toggleApplicationForm}>Apply</button>
                         </div>
@@ -195,7 +195,7 @@ const Opportunity = () => {
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-4'>Applications</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
                                 {opportunity?.applications.map((application, index) => (
-                                    <div key={index} className={`rounded-[8px] border-t-[4px] ${application.status ? "border-green-400" : "border-orange-400"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4 ${loggedUser && ((opportunity.publisher._id === loggedUser.id) || (application.applicant._id === loggedUser.id)) ? "cursor-pointer hover:scale-[103%] hover:shadow-lg" : "cursor-default"}`} onClick={() => handleApplicationClick(application.applicant._id, application._id)}>
+                                    <div key={index} className={`rounded-[8px] border-t-[4px] ${application.status ? "border-green-400" : "border-orange-400"} flex flex-col items-center justify-center shadow-md transform transition duration-300 ease-out px-8 py-4 ${loggedUser && ((opportunity.publisher._id === loggedUser.id) || (application.applicant._id === loggedUser.id) || (loggedUser.type === "admin")) ? "cursor-pointer hover:scale-[103%] hover:shadow-lg" : "cursor-default"}`} onClick={() => handleApplicationClick(application.applicant._id, application._id)}>
                                         <p className='text-[#5a5c69] text-[13px] font-normal mt-2'>{application.applicant.username}</p>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{application.createdAt}</p>
                                         {application.applicant.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white border border-red-300 border-[1px] shadow-lg'></div>}
@@ -207,13 +207,13 @@ const Opportunity = () => {
 
                     </div>
                 </div>
-                {loggedUser.type !== "admin" &&  <button 
+                {(!loggedUser || loggedUser?.type !== "admin") &&  <button 
                     onClick={() => navigate('/')} 
                     className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                     >
                     Home
                 </button>}
-                {loggedUser.type === "admin" &&  <button 
+                {loggedUser?.type === "admin" &&  <button 
                     onClick={() => navigate('/admin')} 
                     className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                     >

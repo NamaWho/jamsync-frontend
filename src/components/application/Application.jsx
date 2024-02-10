@@ -17,7 +17,7 @@ const Application = () => {
         const response = await getApplicationById(id);
         if (response) {
             const user = getAuthenticatedUser();
-            if (user && ((response.publisher._id !== user.id) && (response.applications[0].applicant._id !== user.id))) {
+            if (user && ((response.publisher._id !== user.id) && (response.applications[0].applicant._id !== user.id) && (user.type !== "admin"))) {
                 toast.error("You are not authorized to view this application");
                 navigate("/opportunities/"+response._id);
             } else {
@@ -72,7 +72,7 @@ const Application = () => {
 
     return (
         <>
-            {opportunity && ((opportunity.publisher._id === loggedUser.id) || (opportunity.applications[0].applicant._id === loggedUser.id)) &&
+            {opportunity && ((opportunity.publisher._id === loggedUser.id) || (opportunity.applications[0].applicant._id === loggedUser.id) || (loggedUser.type === "admin")) &&
                 <div>
                     <div className='px-64 pt-20 pb-[40px]'>
                         <div className={`rounded-[18px] flex flex-col items-center justify-between shadow-md bg-white p-8 border-t-[4px] ${application.status ? "border-green-500": "border-orange-500"}`}>
@@ -81,7 +81,7 @@ const Application = () => {
                             <h3 className={`text-[20px] leading-[24px] font-bold mb-8 ${application.status ? "text-green-500":"text-orange-500"}`}>APPLICATION {application.status ? "ACCEPTED": "PENDING"}</h3>
                             {!application.status && loggedUser.id === application.applicant._id && <button onClick={handleDeleteApplication} className='bg-red-400 h-14 py-4 px-6 rounded-[16px] text-white font-bold hover:scale-[103%] hover:bg-red-500 mb-8'>Delete Application</button>}
                             {!application.status && loggedUser.id === opportunity.publisher._id && <button onClick={handleAcceptApplication} className='bg-green-400 h-14 py-4 px-6 rounded-[16px] text-white font-bold hover:scale-[103%] hover:bg-green-500 mb-8'>Accept Application</button>}
-                            {application.status && loggedUser.id === opportunity.publisher._id && <h2 className='text-[20px] leading-[24px] font-bold text-green-500 mb-8'>Email: {application.applicant.contactEmail}</h2>}
+                            {!!application.status && loggedUser.id === opportunity.publisher._id && <h2 className='text-[20px] leading-[24px] font-bold text-green-500 mb-8'>Email: {application.applicant.contactEmail}</h2>}
 
                             <div className={`grid grid-cols-4 gap-x-4 shadow-md rounded-[8px] px-4 py-8 border-2`}>
                                 <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-8'>APPLICATION</h2>
@@ -89,8 +89,8 @@ const Application = () => {
                                     <h2 className='text-gray-500 mr-4 text-[20px] leading-[24px] font-bold mb-2 inline align-top'>Applicant</h2>
                                     <div onClick={() => navigateToUser(opportunity.publisher.type.toLowerCase() === "musician" ? "band":"musician", application.applicant._id)} className='relative rounded-[8px] cursor-pointer inline-flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-2 px-14'>
                                         <p className='text-[#5a5c69] text-[18px] leading-[20px] font-normal mt-5'>{application.applicant.username}</p>
-                                        {opportunity.publisher.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white shadow-lg'></div>}
-                                        {opportunity.publisher.profilePictureUrl !== "" && <img src={application.applicant.profilePictureUrl} alt='profile' className='absolute -top-5 h-10 w-10 rounded-full border border-red-300 border-[1px] shadow-lg bg-white'/>}
+                                        {application.applicant.profilePictureUrl === "" && <div className='absolute -top-5 w-10 h-10 rounded-full bg-white shadow-lg'></div>}
+                                        {application.applicant.profilePictureUrl !== "" && <img src={application.applicant.profilePictureUrl} alt='profile' className='absolute -top-5 h-10 w-10 rounded-full border border-red-300 border-[1px] shadow-lg bg-white'/>}
                                     </div>
                                 </div>
                                 <div className='col-span-4 mb-8'>
