@@ -127,7 +127,7 @@ const Search = () => {
     }
 
     return (
-        <div className='flex flex-col w-full'>
+        <div className='flex flex-col w-full mt-2'>
             <div className='rounded-[8px] flex flex-col w-full justify-between border-l-[4px] border-green-500 px-12 py-8 cursor-pointer hover:shadow-lg transform transition duration-300 ease-out bg-white'>
                 <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mb-8'>SEARCH FOR MUSICIANS, BANDS AND OPPORTUNITIES</h2>
                 {/* search by type, username, genres, instruments, location */}

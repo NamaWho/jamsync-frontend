@@ -62,3 +62,19 @@ export const getSuggestedOpportunitiesByNetwork = async (id, type) => {
         console.error(error);
     }
 }
+
+export const getSuggestedOpportunitiesByNetworkAndSimilarities = async (id, type) => {
+    try {
+        // retrieve user
+        const userUrl = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}`;
+        const userResponse = await axios.get(userUrl);
+        const user = userResponse.data.payload;
+
+        // retrieve suggested opportunities by network and similarities
+        const url = `${process.env.REACT_APP_BASE_URI}/${type}s/suggestedOpportunitiesByNetworkAndSimilarities`;
+        const response = await axios.post(url, user);
+        return response.data.payload;
+    } catch (error) {
+        console.error(error);
+    }
+}

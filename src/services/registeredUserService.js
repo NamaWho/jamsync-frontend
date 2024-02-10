@@ -18,7 +18,7 @@ export const updateUser = async (user, type) => {
   } catch (error) {
     console.error(error);
   }
-}
+};
 
 export const deleteUserById = async (type, id) => {
   try {
@@ -29,7 +29,7 @@ export const deleteUserById = async (type, id) => {
   } catch (error) {
     console.error(error);
   }
-}
+};
 
 export const getFollowersCount = async (type, id) => {
   try {
@@ -91,3 +91,38 @@ export const unfollow = async (id, userId, type) => {
     console.error(error);
   }
 };
+
+export const getSuggestedMusiciansBySimilarities = async (id, type) => {
+  try {
+    // retrieve user
+    const userUrl = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}`;
+    const userResponse = await axios.get(userUrl);
+    const user = userResponse.data.payload;
+
+    const url = `${process.env.REACT_APP_BASE_URI}/${type}s/suggestedMusiciansBySimilarities`;
+    const response = await axios.post(url, user);
+    return response.data.payload;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getSuggestedMusiciansByNetwork = async (id) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/musicians/suggestedMusiciansByNetwork`;
+    const response = await axios.post(url, id);
+    return response.data.payload;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const getSuggestedBandsByNetwork = async (id) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/musicians/suggestedBandsByNetwork`;
+    const response = await axios.post(url, id);
+    return response.data.payload;
+  } catch (error) {
+    console.error(error);
+  }
+}

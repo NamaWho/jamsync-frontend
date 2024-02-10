@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getSuggestedOpportunities, getSuggestedOpportunitiesByNetwork  } from '../../services/opportunityService';
+import { getSuggestedOpportunities, getSuggestedOpportunitiesByNetwork, getSuggestedOpportunitiesByNetworkAndSimilarities  } from '../../services/opportunityService';
 import { FaUser } from 'react-icons/fa';
 
 const SuggestedOpportunities = ({user}) => {
@@ -7,6 +7,7 @@ const SuggestedOpportunities = ({user}) => {
     const [suggestionType, setSuggestionType] = useState(1);
     const [suggestedOpportunities, setSuggestedOpportunities] = useState([]);
     const [suggestedOpportunitiesByNetwork, setSuggestedOpportunitiesByNetwork] = useState([]);
+    // const [suggestedOpportunitiesByNetworkAndSimilarities, setSuggestedOpportunitiesByNetworkAndSimilarities] = useState([])
 
     const fetchSuggestedOpportunities = async () => {
         const result = await getSuggestedOpportunities(user.id, user.type);
@@ -15,6 +16,9 @@ const SuggestedOpportunities = ({user}) => {
         if (user.type === 'musician') {
             const resultByNetwork = await getSuggestedOpportunitiesByNetwork(user.id, user.type);
             setSuggestedOpportunitiesByNetwork(resultByNetwork);
+
+            // const resultByNetworkAndSimilarities = await getSuggestedOpportunitiesByNetworkAndSimilarities(user.id, user.type);
+            // setSuggestedOpportunitiesByNetworkAndSimilarities(resultByNetworkAndSimilarities);
         }
     }
 
@@ -45,10 +49,10 @@ const SuggestedOpportunities = ({user}) => {
                         <input type="radio" name="suggestionType" id="suggestionType2" checked={suggestionType === 2} onChange={() => handleChange(2)} className='mr-2' />
                         <label htmlFor="suggestionType2" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>Opportunities retrieved from your network, published by followed bands or applied by followed musicians</label>
                     </div>
-                    <div className='flex items-center'>
+                    {/* <div className='flex items-center'>
                         <input type="radio" name="suggestionType" id="suggestionType3" checked={suggestionType === 3} onChange={() => handleChange(3)} className='mr-2' />
                         <label htmlFor="suggestionType3" className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>Opportunities retrieved from your network, based on genres/instruments similarities</label>
-                    </div>
+                    </div> */}
                 </>
                 }
             </div>
@@ -81,9 +85,15 @@ const SuggestedOpportunities = ({user}) => {
                         </div>
                     ))}
                 </div>
-                <div className='grid grid-cols-2 gap-6 px-16 mt-[25px]'>
-                    {user.type ==="musician" && suggestionType === 3}
-                </div>
+                {/* <div className='grid grid-cols-2 gap-6 px-16 mt-[25px]'>
+                    {user.type ==="musician" && suggestionType === 3 && suggestedOpportunitiesByNetworkAndSimilarities?.map((result, index) => (
+                        <div key={index} className='h-46 rounded-[8px] bg-white border-l-[4px] border-cyan-500 flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToOpportunity(result._id)}>
+                            <div className="flex justify-between">
+                                <h2 className='text-cyan-500 text-[20px] leading-[24px] font-bold'>{result.title.length > 35 ? result.title.substring(0, 35) + '...' : result.title}</h2>
+                            </div>
+                        </div>
+                    ))}
+                </div> */}
 
         </div>
     );

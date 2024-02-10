@@ -62,6 +62,7 @@ const Edit = ({type}) => {
         const user = updatedUser;
         user.genres = genres.map(genre => genre.value);
         user.instruments = instruments.map(instrument => instrument.value);
+        user.lastUpdateDateTime = new Date().toISOString().split('T')[0];
 
         const result = await updateUser(user, type);
         if (result) {

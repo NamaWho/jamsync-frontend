@@ -9,6 +9,8 @@ import baseInstruments from '../../assets/instruments.js';
 import CreateOpportunityForm from './CreateOpportunityForm';
 import SuggestedOpportunities from './SuggestedOpportunities';
 import Search from "../admin/Search";
+import SuggestedMusicians from './SuggestedMusicians';
+import SuggestedBands from './SuggestedBands';
 
 const Homepage = () => {
     const [open, setOpen] = useState(false)
@@ -75,7 +77,7 @@ const Homepage = () => {
             {loggedUser && 
                 <div className='rounded-[8px] flex items-center justify-between h-[70px] shadow-md px-[25px] '>
                     <div className='flex items-center rounded-[5px]'>
-                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi {loggedUser.username}, welcome back! 👋🏼</h2>
+                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi {loggedUser.username}, welcome back! 🪇</h2>
                     </div>
                     <div className='flex items-center gap-[20px]'>
                         <div className='flex items-center gap-[15px] relative border-l-[1px] pl-[25px]' onClick={showProfile} >
@@ -99,7 +101,7 @@ const Homepage = () => {
             {!loggedUser && 
                 <div className='rounded-[8px] border-t-[4px] border-blue-400 flex items-center justify-between h-[70px] shadow-md px-[25px] '>
                     <div className='flex items-center rounded-[5px]'>
-                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi, welcome to JamSync! 👋🏼</h2>
+                        <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>Hi, welcome to JamSync! 🪇</h2>
                     </div>
                     <div className='flex items-center gap-[20px]'>
                        {/* sign in and sign up */}
@@ -149,8 +151,12 @@ const Homepage = () => {
                     </div>
                 </div>
             }
-            {isSuggestedMusiciansOpen && <></>}
-            {isSuggestedBandsOpen && <></>}
+            {isSuggestedMusiciansOpen && 
+                <SuggestedMusicians user={loggedUser}/>
+            }
+            {isSuggestedBandsOpen && 
+                <SuggestedBands user={loggedUser}/>
+            }
             {isSuggestedOpportunitiesOpen && 
                 <SuggestedOpportunities user={loggedUser}/>
             }

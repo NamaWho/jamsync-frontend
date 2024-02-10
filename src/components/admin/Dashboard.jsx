@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { FaRegCalendarMinus } from "react-icons/fa"
-import { fetchTop5Publishers, fetchTop5AppliedOpportunities } from '../../services/analyticsService';
+import { fetchTop5Publishers, fetchTop5AppliedOpportunities, fetchOpportunitiesByAgeRange, fetchTopGenres } from '../../services/analyticsService';
 import Search from './Search';
 
 const Dashboard = () => {
@@ -10,6 +10,10 @@ const Dashboard = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [top5Publishers, setTop5Publishers] = useState([]);
     const [top5AppliedOpportunities, setTop5AppliedOpportunities] = useState([]);
+    const [opportunitiesByAgeRange, setOpportunitiesByAgeRange] = useState([]);
+    const [topLocations, setTopLocations] = useState([]);
+    const [top5Genres, setTop5Genres] = useState([]);
+
     const navigate = useNavigate();
 
     const fetchAnalytics = async () => {
@@ -20,6 +24,18 @@ const Dashboard = () => {
         const top5AppliedOpportunities = await fetchTop5AppliedOpportunities();
         console.log(top5AppliedOpportunities);
         setTop5AppliedOpportunities(top5AppliedOpportunities);
+
+        const opportunitiesByAgeRange = await fetchOpportunitiesByAgeRange();
+        console.log(opportunitiesByAgeRange);
+        setOpportunitiesByAgeRange(opportunitiesByAgeRange);
+
+        // const topLocations = await fetchTopLocations();
+        // console.log(topLocations);
+        // setTopLocations(topLocations);
+
+        const top5Genres = await fetchTopGenres();
+        console.log(top5Genres);
+        setTop5Genres(top5Genres);
     }
 
     useEffect(() => {
@@ -111,6 +127,68 @@ const Dashboard = () => {
                                     </td>
                                     <td className='border px-4 py-2'>{opportunity.publisher.type === "Band" ? "Musicians" : "Bands"}</td>
                                     <td className='border px-4 py-2'>{opportunity.numApplications}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-8'>OPPORTUNITIES FOR MUSICIANS BY AGE RANGE</h2>
+                    <table className='table-auto w-full mt-4'>
+                        <thead>
+                            <tr>
+                                <th className='px-4 py-2'></th>
+                                <th className='px-4 py-2'>Age Range</th>
+                                <th className='px-4 py-2'>Total Opportunities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {opportunitiesByAgeRange?.map((range, index) => (
+                                <tr key={index} className=''>
+                                    <td className='border px-4 py-2'>{index + 1}</td>
+                                    <td className='border px-4 py-2'>{range.ageRange}</td>
+                                    <td className='border px-4 py-2'>{range.count}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-8'>TOP LOCATIONS</h2>
+                    <table className='table-auto w-full mt-4'>
+                        <thead>
+                            <tr>
+                                <th className='px-4 py-2'></th>
+                                <th className='px-4 py-2'>City</th>
+                                <th className='px-4 py-2'>Country</th>
+                                <th className='px-4 py-2'>Total Opportunities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {topLocations?.map((location, index) => (
+                                <tr key={index} className=''>
+                                    <td className='border px-4 py-2'>{index + 1}</td>
+                                    <td className='border px-4 py-2'>{location.city}</td>
+                                    <td className='border px-4 py-2'>{location.country || location.state}</td>
+                                    <td className='border px-4 py-2'>{location.count}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69] mt-8'>TOP 5 GENRES USED IN OPPORTUNITIES</h2>
+                    <table className='table-auto w-full mt-4'>
+                        <thead>
+                            <tr>
+                                <th className='px-4 py-2'></th>
+                                <th className='px-4 py-2'>Genre</th>
+                                <th className='px-4 py-2'>Total Opportunities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {top5Genres?.map((genre, index) => (
+                                <tr key={index} className=''>
+                                    <td className='border px-4 py-2'>{index + 1}</td>
+                                    <td className='border px-4 py-2'>{genre._id}</td>
+                                    <td className='border px-4 py-2'>{genre.count}</td>
                                 </tr>
                             ))}
                         </tbody>
