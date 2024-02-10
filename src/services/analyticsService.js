@@ -37,7 +37,7 @@ export const fetchOpportunitiesByAgeRange = async () => {
 export const fetchTopLocations = async () => {
   try {
     const res = await axios.get(
-      process.env.REACT_APP_BASE_URI + "/opportunities/topLocations"
+      process.env.REACT_APP_BASE_URI + "/opportunities/topLocationsForOpportunities"
     );
     return res.data.payload;
   } catch (error) {

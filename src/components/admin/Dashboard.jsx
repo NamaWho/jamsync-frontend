@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { FaRegCalendarMinus } from "react-icons/fa"
-import { fetchTop5Publishers, fetchTop5AppliedOpportunities, fetchOpportunitiesByAgeRange, fetchTopGenres } from '../../services/analyticsService';
+import { fetchTop5Publishers, fetchTop5AppliedOpportunities, fetchOpportunitiesByAgeRange, fetchTopGenres, fetchTopLocations } from '../../services/analyticsService';
 import Search from './Search';
 
 const Dashboard = () => {
@@ -29,9 +29,9 @@ const Dashboard = () => {
         console.log(opportunitiesByAgeRange);
         setOpportunitiesByAgeRange(opportunitiesByAgeRange);
 
-        // const topLocations = await fetchTopLocations();
-        // console.log(topLocations);
-        // setTopLocations(topLocations);
+        const topLocations = await fetchTopLocations();
+        console.log(topLocations);
+        setTopLocations(topLocations);
 
         const top5Genres = await fetchTopGenres();
         console.log(top5Genres);
@@ -166,9 +166,9 @@ const Dashboard = () => {
                             {topLocations?.map((location, index) => (
                                 <tr key={index} className=''>
                                     <td className='border px-4 py-2'>{index + 1}</td>
-                                    <td className='border px-4 py-2'>{location.city}</td>
-                                    <td className='border px-4 py-2'>{location.country || location.state}</td>
-                                    <td className='border px-4 py-2'>{location.count}</td>
+                                    <td className='border px-4 py-2'>{location._id.city}</td>
+                                    <td className='border px-4 py-2'>{location._id.country || location._id.state}</td>
+                                    <td className='border px-4 py-2'>{location.totalOpportunities}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -180,7 +180,7 @@ const Dashboard = () => {
                             <tr>
                                 <th className='px-4 py-2'></th>
                                 <th className='px-4 py-2'>Genre</th>
-                                <th className='px-4 py-2'>Total Opportunities</th>
+                                <th className='px-4 py-2'>Total Occurences</th>
                             </tr>
                         </thead>
                         <tbody>
