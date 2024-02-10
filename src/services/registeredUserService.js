@@ -92,6 +92,28 @@ export const unfollow = async (id, userId, type) => {
   }
 };
 
+export const addMemberById = async (bandId, memberId) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/bands/${bandId}/member?memberId=${memberId}`;
+    const response = await axios.post(url);
+    return response.data.error;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
+export const deleteMemberById = async (bandId, memberId) => {
+  try {
+    const url = `${process.env.REACT_APP_BASE_URI}/bands/${bandId}/member?memberId=${memberId}`;
+    const response = await axios.delete(url);
+    return response.data.error;
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
+
 export const getSuggestedMusiciansBySimilarities = async (id, type) => {
   try {
     // retrieve user

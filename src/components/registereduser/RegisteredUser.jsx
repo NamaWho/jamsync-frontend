@@ -7,6 +7,8 @@ import { follow, unfollow } from '../../services/registeredUserService';
 import toast from 'react-hot-toast';
 import { deleteUserById } from '../../services/registeredUserService';
 import { banUserById } from '../../services/authService';
+import { deleteMemberById } from '../../services/registeredUserService';
+import { addMemberById } from '../../services/registeredUserService';
 
 const RegisteredUser = ({type}) => {
     const { id } = useParams();
@@ -124,6 +126,26 @@ const RegisteredUser = ({type}) => {
         }
     }
 
+    const handleAddToBand = async () => {
+        const error = await addMemberById(loggedUser.id, user._id);
+        if (!error) {
+            toast.success("Member added successfully");
+        } else {
+            toast.error("Error adding member");
+        }
+    }
+
+    const handleDeleteMember = async (memberId) => {
+        const result = await deleteMemberById(loggedUser.id, memberId);
+        if (!result) {
+            const updatedMembers = members.filter(member => member._id !== memberId);
+            setMembers(updatedMembers);
+            toast.success("Member deleted successfully");
+        } else {
+            toast.error("Error deleting member");
+        }
+    }
+
     return (
         <>
         {user &&
@@ -148,6 +170,11 @@ const RegisteredUser = ({type}) => {
                         <div className='flex gap-x-4 mt-2'>
                             {!following && <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleFollowClick}>Follow</button>}
                             {following && <button className='bg-red-500 text-white rounded-md px-4 py-2 hover:bg-red-600 transition duration-300 ease-out' onClick={handleUnFollowClick}>Unfollow</button>}
+                        </div>
+                    }
+                    {type === "musician" && loggedUser?.type === "band" && 
+                        <div className='flex gap-x-4 mt-2'>
+                            <button className='bg-green-500 text-white rounded-md px-4 py-2 hover:bg-green-600 transition duration-300 ease-out' onClick={handleAddToBand}>Add to band</button>
                         </div>
                     }
                     <div className="grid grid-cols-4 gap-x-4">
@@ -195,8 +222,9 @@ const RegisteredUser = ({type}) => {
                                     <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Members</h2>
                                     <div className="flex flex-wrap gap-x-4 gap-y-2">
                                         {members.map((member, index) => (
-                                            <div key={index} onClick={() => navigate(`/musicians/${member._id}`)} className='rounded-[8px] cursor-pointer border-t-[4px] border-yellow-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/6'>
-                                                <p className='text-[#5a5c69] text-[13px] font-normal'>{member.username}</p>
+                                            <div key={index} className='rounded-[8px] cursor-pointer border-t-[4px] border-yellow-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
+                                                <p onClick={() => navigate(`/musicians/${member._id}`)} className='text-[#5a5c69] text-[13px] font-normal pl-5'>{member.username}</p>
+                                                {loggedUser && loggedUser.id === user._id && <span className='text-red-500 px-4 hover:text-red-600 font-bold transition duration-300 ease-out' onClick={() => handleDeleteMember(member._id)}>X</span>}
                                             </div>
                                         ))}
                                     </div>
