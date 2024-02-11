@@ -76,11 +76,31 @@ const SuggestedOpportunities = ({user}) => {
                         </div>
                     ))}
                 </div>
-                <div className='grid grid-cols-3 gap-6 px-16 mt-[25px]'>
+                <div className='grid grid-cols-2 gap-6 px-16 mt-[25px]'>
                     {user.type ==="musician" && suggestionType === 2 && suggestedOpportunitiesByNetwork?.map((result, index) => (
                         <div key={index} className='h-46 rounded-[8px] bg-white border-l-[4px] border-cyan-500 flex flex-col justify-between px-8 cursor-pointer hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out py-4' onClick={() => navigateToOpportunity(result._id)}>
-                            <div className="flex justify-between">
+                            <div className="flex flex-col justify-between">
                                 <h2 className='text-cyan-500 text-[20px] leading-[24px] font-bold'>{result.title.length > 35 ? result.title.substring(0, 35) + '...' : result.title}</h2>
+                                {result?.instruments?.length > 0 && 
+                                    <div className="flex items-center">
+                                        <p className='mr-1'>Instruments:</p>
+                                        <p key={index} className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>
+                                            {result.instruments.map((instrument, index) => (
+                                                <span>{instrument}, </span>
+                                            ))}
+                                        </p>
+                                    </div>
+                                }
+                                {result?.genres?.length > 0 &&
+                                    <div className="flex items-center">
+                                        <p className='mr-1'>Genres:</p>
+                                        <p key={index} className='text-[#5a5c69] text-[14px] leading-[20px] font-normal'>
+                                            {result.genres.map((genre, index) => (
+                                                <span>{genre}, </span>
+                                            ))}
+                                        </p>
+                                    </div>
+                                }
                             </div>
                         </div>
                     ))}
