@@ -4,7 +4,7 @@ import axios from "axios";
 export const fetchTop5Publishers = async () => {
   try {
     const res = await axios.get(
-      process.env.REACT_APP_BASE_URI + "/users/topPublishers"
+      process.env.REACT_APP_BASE_URI + "/opportunities/topPublishers"
     );
     return res.data.payload;
   } catch (error) {

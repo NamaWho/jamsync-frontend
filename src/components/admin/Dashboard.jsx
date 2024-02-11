@@ -77,17 +77,15 @@ const Dashboard = () => {
             </div>
             {isAnalyticsOpen && 
                 <div className='bg-white rounded-[8px] border-l-[4px] border-[#4E73DF] flex flex-col justify-between p-8 hover:shadow-lg transform transition duration-300 ease-out'>
-                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>TOP 5 PUBLISHERS</h2>
+                    <h2 className='text-[20px] leading-[24px] font-bold text-[#5a5c69]'>TOP 5 PUBLISHERS THIS WEEK</h2>
                     <table className='table-auto w-full mt-4'>
                         <thead>
                             <tr>
                                 <th className='px-4 py-2'></th>
                                 <th className='px-4 py-2'></th>
                                 <th className='px-4 py-2'>Publisher</th>
-                                <th className='px-4 py-2'>Total Opportunities</th>
-                                <th className='px-4 py-2'>Total Applications</th>
-                                <th className='px-4 py-2'>Accepted Applications</th>
-                                <th className='px-4 py-2'>Acceptance Rate</th>
+                                <th className='px-4 py-2'>Opportunities published</th>
+                                <th className='px-4 py-2'>Applications Received</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,14 +93,12 @@ const Dashboard = () => {
                                 <tr key={index} className=''>
                                     <td className='border px-4 py-2'>{index + 1}</td>
                                     <td className='border px-4 py-2'>
-                                        {publisher.profilePictureUrl !== "" && <img src={publisher.profilePictureUrl} alt={publisher.username} className='w-10 h-10 rounded-full' />}
-                                        {publisher.profilePictureUrl === "" && <div className='w-10 h-10 rounded-full bg-[#F8F9FC]'></div>}
+                                        {publisher?.profilePictureUrl !== "" && <img src={publisher.profilePictureUrl} alt={publisher.username} className='w-10 h-10 rounded-full' />}
+                                        {publisher?.profilePictureUrl === "" && <div className='w-10 h-10 rounded-full bg-[#F8F9FC]'></div>}
                                     </td>
-                                    <td className='border px-4 py-2'>{publisher.username}</td>
+                                    <td onClick={() => navigate("/"+publisher.type.toLowerCase()+"s/"+publisher._id)} className='border px-4 py-2 hover:text-blue-500 hover:underline cursor-pointer'>{publisher.username}</td>
                                     <td className='border px-4 py-2'>{publisher.totalOpportunities}</td>
                                     <td className='border px-4 py-2'>{publisher.totalApplications}</td>
-                                    <td className='border px-4 py-2'>{publisher.acceptedApplications}</td>
-                                    <td className='border px-4 py-2'>{publisher.acceptanceRate}</td>
                                 </tr>
                             ))}
                         </tbody>
