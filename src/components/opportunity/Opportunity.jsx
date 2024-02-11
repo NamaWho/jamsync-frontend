@@ -51,7 +51,7 @@ const Opportunity = () => {
 
     const handleSendApplicationClick = async () => {
         const data = {
-            _id: uuidv4(),
+            _id: "",
             createdAt: new Date().toISOString().split('T')[0],
             applicant: {
                 _id: loggedUser.id,

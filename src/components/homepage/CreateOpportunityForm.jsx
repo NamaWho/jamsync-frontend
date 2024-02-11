@@ -55,7 +55,7 @@ const CreateOpportunityForm = ({user, baseGenres, baseInstruments, baseLocations
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = {
-            _id: uuidv4(),
+            _id: "",
             title,
             description,
             location,
@@ -75,7 +75,6 @@ const CreateOpportunityForm = ({user, baseGenres, baseInstruments, baseLocations
             applications: [],
             createdAt: new Date().toISOString().split('T')[0],
             expiresAt,
-            // modifiedAt: new Date().toISOString().split('T')[0]
         }
 
         const result = await createOpportunity(data);
@@ -210,6 +209,7 @@ const CreateOpportunityForm = ({user, baseGenres, baseInstruments, baseLocations
                         className='bg-white h-[40px] outline-none pl-[13px] w-full rounded-[5px] placeholder:text-[14px] leading-[20px] font-normal' 
                         placeholder='Expires At' 
                         min={new Date().toISOString().split('T')[0]}
+                        required
                 />
             </div>
             <div className='col-span-4 flex justify-center items-center'>

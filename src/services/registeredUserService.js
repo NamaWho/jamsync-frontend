@@ -114,14 +114,14 @@ export const deleteMemberById = async (bandId, memberId) => {
   }
 }
 
-export const getSuggestedMusiciansBySimilarities = async (id, type) => {
+export const getSuggestedMusiciansBySimilarities = async (id) => {
   try {
     // retrieve user
-    const userUrl = `${process.env.REACT_APP_BASE_URI}/${type}s/${id}`;
+    const userUrl = `${process.env.REACT_APP_BASE_URI}/musicians/${id}`;
     const userResponse = await axios.get(userUrl);
     const user = userResponse.data.payload;
 
-    const url = `${process.env.REACT_APP_BASE_URI}/${type}s/suggestedMusiciansBySimilarities`;
+    const url = `${process.env.REACT_APP_BASE_URI}/musicians/suggestedMusiciansBySimilarities`;
     const response = await axios.post(url, user);
     return response.data.payload;
   } catch (error) {
@@ -138,6 +138,21 @@ export const getSuggestedMusiciansByNetwork = async (id) => {
     console.error(error);
   }
 }
+
+export const getSuggestedBandsBySimilarities = async (id) => {
+  try {
+    // retrieve user
+    const userUrl = `${process.env.REACT_APP_BASE_URI}/musicians/${id}`;
+    const userResponse = await axios.get(userUrl);
+    const user = userResponse.data.payload;
+
+    const url = `${process.env.REACT_APP_BASE_URI}/musicians/suggestedBandsBySimilarities`;
+    const response = await axios.post(url, user);
+    return response.data.payload;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export const getSuggestedBandsByNetwork = async (id) => {
   try {

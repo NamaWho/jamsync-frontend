@@ -76,7 +76,7 @@ const Signup = () => {
         const labelsGenres = genres.map(genre => genre.label);
         // Handle Signup logic here
         const payload = {
-            _id: uuidv4(),
+            _id: "",
             username,
             contactEmail,
             about,
