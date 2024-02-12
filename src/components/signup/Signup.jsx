@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
     const [submitDisabled, setSubmitDisabled] = useState(false);
+    const [typingTimeout, setTypingTimeout] = useState(null);
     const [type, setType] = useState('Musician');
     const [username, setUsername] = useState('');
     const [contactEmail, setContactEmail] = useState('');
@@ -62,12 +63,17 @@ const Signup = () => {
     };
 
     const handleUserChange = async (value) => {
-        // if the user already exists, show a message and disable the submit button
-        const exists = await checkUser(type.toLowerCase(), value);
-        if (exists)
-            toast.error('User already exists');
-        setSubmitDisabled(exists);
         setUser(value);
+
+        if (typingTimeout) clearTimeout(typingTimeout);
+        
+        setTypingTimeout(setTimeout(async () => {
+            // if the user already exists, show a message and disable the submit button
+            const exists = await checkUser(type.toLowerCase(), value);
+            if (exists)
+                toast.error('User already exists');
+            setSubmitDisabled(exists);
+        }, 300));
     };
     
     const handleSignup = async (event) => {
@@ -100,7 +106,7 @@ const Signup = () => {
             applications:[],
             opportunities: []
         }
-
+        console.log(payload);
         const result = await register(type, payload);
         if (result.error)
             toast.error('Error creating user');
@@ -197,6 +203,7 @@ const Signup = () => {
                             name="profilePictureUrl" 
                             value={profilePictureUrl}
                             onChange={(e) => setProfilePictureUrl(e.target.value)}
+                            required
                         />
                     </div>
 

@@ -63,6 +63,20 @@ const Edit = ({type}) => {
         user.genres = genres.map(genre => genre.value);
         user.instruments = instruments.map(instrument => instrument.value);
         user.lastUpdateDateTime = new Date().toISOString().split('T')[0];
+        
+        console.log(user);
+        // remove empty fields or null values, or empty arrays
+        Object.keys(user).forEach(key => {
+            if (Array.isArray(user[key]) && user[key].length === 0){
+                delete user[key];
+            } else if (user[key] === '' || user[key] === null || user[key] === undefined){
+                delete user[key];
+            }
+        });
+        if (!user.isBanned) delete user.isBanned;
+        console.log(user);
+
+
 
         const result = await updateUser(user, type);
         if (result) {
@@ -131,6 +145,7 @@ const Edit = ({type}) => {
                                     name="profilePictureUrl" 
                                     value={updatedUser.profilePictureUrl}
                                     onChange={(e) => setUpdatedUser({...updatedUser, profilePictureUrl: e.target.value})}
+                                    required
                                 />
                             </div>
                             

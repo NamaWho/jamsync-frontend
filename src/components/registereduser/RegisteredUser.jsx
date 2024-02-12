@@ -185,7 +185,7 @@ const RegisteredUser = ({type}) => {
                         <div className="col-span-2 mb-8">
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Genres</h2>
                             <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                {user.genres.map((genre, index) => (
+                                {user?.genres?.map((genre, index) => (
                                     <div key={index} className='rounded-[8px] cursor-default border-t-[4px] border-blue-400 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out w-1/4 '>
                                         <p className='text-[#5a5c69] text-[13px] font-normal'>{genre}</p>
                                     </div>
@@ -221,7 +221,7 @@ const RegisteredUser = ({type}) => {
                                 <div className="col-span-4 flex-col mb-8">
                                     <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2'>Members</h2>
                                     <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                        {members.map((member, index) => (
+                                        {members?.map((member, index) => (
                                             <div key={index} className='rounded-[8px] cursor-pointer border-t-[4px] border-yellow-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[103%] transition duration-300 ease-out'>
                                                 <p onClick={() => navigate(`/musicians/${member._id}`)} className='text-[#5a5c69] text-[13px] font-normal pl-5'>{member.username}</p>
                                                 {loggedUser && loggedUser.id === user._id && <span className='text-red-500 px-4 hover:text-red-600 font-bold transition duration-300 ease-out' onClick={() => handleDeleteMember(member._id)}>X</span>}
@@ -265,7 +265,7 @@ const RegisteredUser = ({type}) => {
                         <div className='col-span-4 mb-8'>
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Oppportunities published</h2>
                             <div className="flex flex-col gap-y-2">
-                                {user.opportunities.map((opportunity, index) => (
+                                {user?.opportunities?.map((opportunity, index) => (
                                     <div key={index} className={`rounded-[8px] px-8 py-2 cursor-pointer border-l-[4px] ${type === "musician" ? "border-red-500" : "border-blue-500"} flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out`} onClick={() => handleOpportunityClick(opportunity._id)}>
                                         {/* must provide title and date of creation */}
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{opportunity.title}</p>
@@ -278,7 +278,7 @@ const RegisteredUser = ({type}) => {
                         <div className='col-span-4 mb-8'>
                             <h2 className='text-red-500 text-[20px] leading-[24px] font-bold mb-2 w-full'>Applications made</h2>
                             <div className="flex flex-col gap-y-2">
-                                {user.applications.map((application, index) => (
+                                {user?.applications?.map((application, index) => (
                                     <div key={index} className={`rounded-[8px] px-8 py-2 cursor-pointer border-l-[4px] ${type === "musician" ? "border-red-500" : "border-blue-500"} flex items-center justify-between shadow-md hover:shadow-lg hover:bg-purple-100 transform hover:scale-[103%] transition duration-300 ease-out`} onClick={() => handleApplicationClick(application._id)}>
                                         {/* must provide title and date of creation */}
                                         <p className='text-[#5a5c69] text-[16px] font-normal'>{application.title}</p>

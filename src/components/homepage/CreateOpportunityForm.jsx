@@ -77,6 +77,15 @@ const CreateOpportunityForm = ({user, baseGenres, baseInstruments, baseLocations
             expiresAt,
         }
 
+        console.log(data);
+        // remove empty fields, null, undefined and empty arrays
+        Object.keys(data).forEach(key => {
+            if (data[key] === null || data[key] === undefined || data[key] === '' || (Array.isArray(data[key]) && data[key].length === 0) || data[key] === 0) {
+                delete data[key];
+            }
+        });
+        console.log(data);
+
         const result = await createOpportunity(data);
         if (result !== null) {
             toast.success('Opportunity created successfully');
