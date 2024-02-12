@@ -19,6 +19,10 @@ const Opportunity = () => {
 
     const fetchOpportunity = async () => {
         const result = await searchOpportunity(id);
+        if (!result){
+            navigate('/404');
+            return;
+        }
         setOpportunity(result);
     }
 
