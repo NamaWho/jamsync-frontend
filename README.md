@@ -1,70 +1,37 @@
-# Getting Started with Create React App
+# JamSync
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the JamSync project repository! This project was developed as part of the Master's Degree program in Artificial Intelligence and Data Engineering at the Universita' di Pisa for the academic year 2023/2024 (Large Scale and Multi-Structured Databases).
 
-## Available Scripts
+## Overview
+JamSync is a web-based platform designed to facilitate collaboration and networking within the music industry. The platform allows bands and musicians to connect and interact seamlessly and publish opportunities and collaboration proposals.
 
-In the project directory, you can run:
+## Technologies Used
+- **Backend**: Java, Java Spring Boot
+- **Frontend**: React
+- **Databases**: MongoDB (DocumentDB), Neo4J (GraphDB)
+- **Other Tools**: Python
 
-### `npm start`
+## Features
+- Data Gathering and Data Cleansing
+- CRUD Operations
+- UML Use Case Diagram
+- UML Class Analysis and Diagram
+- Distributed Database Design
+- System Architecture
+- Implementation of Controllers, Services, DAOs, Models, and Repositories
+- Scheduled Tasks for routine operations
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## System Architecture
+The system is designed with resilience in mind, utilizing MongoDB and Neo4J databases for efficient data management. The application is structured into layers for user interface, application logic, and data persistence.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Repository Structure
+- **Backend Repository**: [link](https://github.com/NamaWho/jamsync-backend)
+- **Frontend Repository**: [link](https://github.com/NamaWho/jamsync-frontend)
 
-### `npm test`
+Feel free to explore the codebase of JamSync. Your feedback and contributions are highly appreciated!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Thank you for visiting the JamSync repository! 🎵🎸
 
-### `npm run build`
+## Badges
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
